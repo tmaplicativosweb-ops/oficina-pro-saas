@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, Company, AuthState, UserRole } from '../types';
+import { User, Company, AuthState, UserRole } from './types';
 
 interface AuthContextType extends AuthState {
   login: (u: User, c: Company | null) => void;
@@ -18,7 +18,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   });
 
   useEffect(() => {
-    // Check session storage on mount
     const storedUser = sessionStorage.getItem('oficina_user');
     const storedCompany = sessionStorage.getItem('oficina_company');
     
