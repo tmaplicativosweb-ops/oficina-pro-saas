@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
-import { MasterDashboard } from './pages/MasterDashboard';
-import { ClientDashboard } from './pages/ClientDashboard';
-import { Layout } from './components/Layout';
+import { AuthProvider, useAuth } from './AuthContext';
+import { Login } from './Login';
+import { Register } from './Register';
+import { MasterDashboard } from './MasterDashboard';
+import { ClientDashboard } from './ClientDashboard';
+import { Layout } from './Layout';
 import { UserRole } from './types';
 
 const AppContent: React.FC = () => {
