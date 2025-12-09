@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { dbService, authService } from './mockDb';
-import { Company, CompanyStatus, PlanType } from './types';
+import { dbService, authService } from '../services/mockDb';
+import { Company, CompanyStatus, PlanType } from '../types';
 import { Shield, Ban, CheckCircle, Calendar, LogIn, DollarSign, TrendingUp, AlertTriangle, Users } from 'lucide-react';
-import { useAuth } from './AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 
 const formatCurrency = (val: number) => {
    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
@@ -124,6 +124,7 @@ export const MasterDashboard: React.FC = () => {
            <Shield className="mr-2 text-blue-600" />
            Controle de Clientes (SaaS)
         </h3>
+        {/* ADDED: overflow-x-auto for mobile table scrolling */}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

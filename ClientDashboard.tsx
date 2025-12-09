@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useAuth } from './AuthContext';
-import { dbService } from './mockDb';
-import { ServiceOrder, Customer, OSStatus, Product, OSItem, Company, Transaction, TransactionType, TeamMember, Checklist, ChecklistStatus, Appointment, AppointmentStatus } from './types';
+import { useAuth } from '../contexts/AuthContext';
+import { dbService } from '../services/mockDb';
+import { ServiceOrder, Customer, OSStatus, Product, OSItem, Company, Transaction, TransactionType, TeamMember, Checklist, ChecklistStatus, Appointment, AppointmentStatus } from '../types';
 import { Plus, Search, Car, FileText, CheckCircle, Clock, DollarSign, XCircle, Ban, MessageCircle, Package, Trash2, Wrench, Printer, Calendar, History, Columns, List, Save, Building2, MapPin, TrendingUp, TrendingDown, User, UserCheck, ClipboardCheck, Fuel, ArrowRight, Trophy, BarChart3, PieChart, Upload, FileSpreadsheet, AlertCircle, Check, Loader2, Pencil, ArrowLeft, Download } from 'lucide-react';
 
 const openWhatsApp = (phone: string, message: string) => {
@@ -878,41 +878,43 @@ const FinancialView: React.FC<{ companyId: string }> = ({ companyId }) => {
                </button>
             </div>
             
-            <table className="min-w-full">
-               <thead className="bg-gray-50">
-                  <tr>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
-                     <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valor</th>
-                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
-                  </tr>
-               </thead>
-               <tbody className="divide-y divide-gray-100">
-                  {transactions.map(t => (
-                     <tr key={t.id}>
-                        <td className="px-6 py-4 text-sm text-gray-500">{new Date(t.date).toLocaleDateString()}</td>
-                        <td className="px-6 py-4 font-medium text-gray-800">{t.description}</td>
-                        <td className="px-6 py-4 text-sm text-gray-500">
-                           <span className="bg-gray-100 px-2 py-1 rounded text-xs">{t.category}</span>
-                        </td>
-                        <td className={`px-6 py-4 text-right font-bold ${t.type === TransactionType.INCOME ? 'text-green-600' : 'text-red-600'}`}>
-                           {t.type === TransactionType.INCOME ? '+' : '-'}{formatCurrency(t.amount)}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                           <button onClick={() => handleDelete(t.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
-                        </td>
+            <div className="overflow-x-auto">
+               <table className="min-w-full">
+                  <thead className="bg-gray-50">
+                     <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Descrição</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Categoria</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valor</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
                      </tr>
-                  ))}
-                  {transactions.length === 0 && (
-                     <tr><td colSpan={5} className="p-8 text-center text-gray-400">Nenhum lançamento manual registrado.</td></tr>
-                  )}
-               </tbody>
-            </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                     {transactions.map(t => (
+                        <tr key={t.id}>
+                           <td className="px-6 py-4 text-sm text-gray-500">{new Date(t.date).toLocaleDateString()}</td>
+                           <td className="px-6 py-4 font-medium text-gray-800">{t.description}</td>
+                           <td className="px-6 py-4 text-sm text-gray-500">
+                              <span className="bg-gray-100 px-2 py-1 rounded text-xs">{t.category}</span>
+                           </td>
+                           <td className={`px-6 py-4 text-right font-bold ${t.type === TransactionType.INCOME ? 'text-green-600' : 'text-red-600'}`}>
+                              {t.type === TransactionType.INCOME ? '+' : '-'}{formatCurrency(t.amount)}
+                           </td>
+                           <td className="px-6 py-4 text-center">
+                              <button onClick={() => handleDelete(t.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
+                           </td>
+                        </tr>
+                     ))}
+                     {transactions.length === 0 && (
+                        <tr><td colSpan={5} className="p-8 text-center text-gray-400">Nenhum lançamento manual registrado.</td></tr>
+                     )}
+                  </tbody>
+               </table>
+            </div>
          </div>
 
          {showModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-xl p-6 w-full max-w-md">
                   <h3 className="text-lg font-bold mb-4">Novo Lançamento</h3>
                   <form onSubmit={handleSave} className="space-y-4">
@@ -1144,7 +1146,7 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
          </div>
 
          {showModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-xl p-6 w-full max-w-md">
                   <h3 className="text-lg font-bold mb-4">{editingId ? 'Editar Agendamento' : 'Novo Agendamento'}</h3>
                   <form onSubmit={handleSave} className="space-y-4">
@@ -1243,45 +1245,47 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
          </div>
 
          <div className="bg-white rounded-xl shadow-sm border border-gray-200">
-            <table className="min-w-full">
-               <thead className="bg-gray-50">
-                  <tr>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cargo</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Comissão (%)</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produção (Mão de Obra)</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-green-600 uppercase">Comissão a Pagar</th>
-                     <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
-                  </tr>
-               </thead>
-               <tbody className="divide-y divide-gray-100">
-                  {members.map(m => {
-                     const laborTotal = reportData[m.id] || 0;
-                     const commissionValue = laborTotal * (m.commissionRate / 100);
-                     
-                     return (
-                        <tr key={m.id}>
-                           <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
-                                 {m.name.charAt(0)}
-                              </div>
-                              {m.name}
-                           </td>
-                           <td className="px-6 py-4 text-gray-500">{m.role}</td>
-                           <td className="px-6 py-4 font-mono text-sm">{m.commissionRate}%</td>
-                           <td className="px-6 py-4 text-gray-500">{formatCurrency(laborTotal)}</td>
-                           <td className="px-6 py-4 font-bold text-green-600">{formatCurrency(commissionValue)}</td>
-                           <td className="px-6 py-4 text-center">
-                              <button onClick={() => handleDelete(m.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={16}/></button>
-                           </td>
-                        </tr>
-                     );
-                  })}
-                  {members.length === 0 && (
-                     <tr><td colSpan={6} className="p-8 text-center text-gray-400">Nenhum funcionário cadastrado.</td></tr>
-                  )}
-               </tbody>
-            </table>
+            <div className="overflow-x-auto">
+               <table className="min-w-full">
+                  <thead className="bg-gray-50">
+                     <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cargo</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Comissão (%)</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produção (Mão de Obra)</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-green-600 uppercase">Comissão a Pagar</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
+                     </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                     {members.map(m => {
+                        const laborTotal = reportData[m.id] || 0;
+                        const commissionValue = laborTotal * (m.commissionRate / 100);
+                        
+                        return (
+                           <tr key={m.id}>
+                              <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-2">
+                                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs">
+                                    {m.name.charAt(0)}
+                                 </div>
+                                 {m.name}
+                              </td>
+                              <td className="px-6 py-4 text-gray-500">{m.role}</td>
+                              <td className="px-6 py-4 font-mono text-sm">{m.commissionRate}%</td>
+                              <td className="px-6 py-4 text-gray-500">{formatCurrency(laborTotal)}</td>
+                              <td className="px-6 py-4 font-bold text-green-600">{formatCurrency(commissionValue)}</td>
+                              <td className="px-6 py-4 text-center">
+                                 <button onClick={() => handleDelete(m.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={16}/></button>
+                              </td>
+                           </tr>
+                        );
+                     })}
+                     {members.length === 0 && (
+                        <tr><td colSpan={6} className="p-8 text-center text-gray-400">Nenhum funcionário cadastrado.</td></tr>
+                     )}
+                  </tbody>
+               </table>
+            </div>
          </div>
          
          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-800">
@@ -1290,7 +1294,7 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
          </div>
 
          {showModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                <div className="bg-white rounded-xl p-6 w-full max-w-md">
                   <h3 className="text-lg font-bold mb-4">Novo Funcionário</h3>
                   <form onSubmit={handleSave} className="space-y-4">
@@ -1662,7 +1666,7 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
 
 const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
    const [products, setProducts] = useState<Product[]>([]);
-   const [searchTerm, setSearchTerm] = useState('');
+   const [searchTerm, setSearchTerm] = useState(''); // NEW SEARCH
    const [showModal, setShowModal] = useState(false);
    const [editingId, setEditingId] = useState<string | null>(null);
    const [newProd, setNewProd] = useState({ name: '', costPrice: '', sellPrice: '', quantity: '' });
@@ -1739,46 +1743,48 @@ const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
          </div>
 
          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-               <thead className="bg-gray-50">
-                  <tr>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome da Peça</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qtd</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Custo</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Venda</th>
-                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-                  </tr>
-               </thead>
-               <tbody className="divide-y divide-gray-200">
-                  {filteredProducts.map(p => (
-                     <tr key={p.id}>
-                        <td className="px-6 py-4 font-medium text-gray-900">{p.name}</td>
-                        <td className="px-6 py-4">
-                           <span className={`px-2 py-1 rounded-full text-xs font-bold ${p.quantity < 5 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                              {p.quantity} un
-                           </span>
-                        </td>
-                        <td className="px-6 py-4 text-gray-500">{formatCurrency(p.costPrice)}</td>
-                        <td className="px-6 py-4 text-gray-900 font-semibold">{formatCurrency(p.sellPrice)}</td>
-                        <td className="px-6 py-4 flex items-center gap-2">
-                           <button onClick={() => handleEdit(p)} className="text-blue-400 hover:text-blue-600">
-                              <Pencil size={18} />
-                           </button>
-                           <button onClick={() => handleDelete(p.id)} className="text-red-400 hover:text-red-600">
-                              <Trash2 size={18} />
-                           </button>
-                        </td>
+            <div className="overflow-x-auto">
+               <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                     <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome da Peça</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qtd</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Custo</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Venda</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
                      </tr>
-                  ))}
-                  {filteredProducts.length === 0 && (
-                     <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Nenhuma peça encontrada.</td></tr>
-                  )}
-               </tbody>
-            </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                     {filteredProducts.map(p => (
+                        <tr key={p.id}>
+                           <td className="px-6 py-4 font-medium text-gray-900">{p.name}</td>
+                           <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded-full text-xs font-bold ${p.quantity < 5 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                                 {p.quantity} un
+                              </span>
+                           </td>
+                           <td className="px-6 py-4 text-gray-500">{formatCurrency(p.costPrice)}</td>
+                           <td className="px-6 py-4 text-gray-900 font-semibold">{formatCurrency(p.sellPrice)}</td>
+                           <td className="px-6 py-4 flex items-center gap-2">
+                              <button onClick={() => handleEdit(p)} className="text-blue-400 hover:text-blue-600">
+                                 <Pencil size={18} />
+                              </button>
+                              <button onClick={() => handleDelete(p.id)} className="text-red-400 hover:text-red-600">
+                                 <Trash2 size={18} />
+                              </button>
+                           </td>
+                        </tr>
+                     ))}
+                     {filteredProducts.length === 0 && (
+                        <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Nenhuma peça encontrada.</td></tr>
+                     )}
+                  </tbody>
+               </table>
+            </div>
          </div>
 
          {showModal && (
-         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl p-6 w-full max-w-md">
                <h3 className="text-lg font-bold mb-4">{editingId ? 'Editar Peça' : 'Cadastrar Peça'}</h3>
                <form onSubmit={handleSave} className="space-y-4">
@@ -1814,7 +1820,7 @@ const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
 
 const CustomersView: React.FC<{ companyId: string }> = ({ companyId }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(''); // NEW SEARCH
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [newCust, setNewCust] = useState({ name: '', phone: '', vehicleModel: '', vehiclePlate: '' });
@@ -1888,51 +1894,53 @@ const CustomersView: React.FC<{ companyId: string }> = ({ companyId }) => {
       </div>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-           <thead className="bg-gray-50">
-              <tr>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Veículo</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Placa</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-              </tr>
-           </thead>
-           <tbody className="divide-y divide-gray-200">
-              {filteredCustomers.map(c => (
-                 <tr key={c.id}>
-                    <td className="px-6 py-4 font-medium text-gray-900">{c.name}</td>
-                    <td className="px-6 py-4 text-gray-500">{c.phone}</td>
-                    <td className="px-6 py-4">{c.vehicleModel}</td>
-                    <td className="px-6 py-4 font-mono text-sm bg-gray-50 w-min rounded px-2">{c.vehiclePlate}</td>
-                    <td className="px-6 py-4 flex gap-2">
-                       <button 
-                        onClick={() => handleEdit(c)}
-                        className="text-blue-400 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Editar Cliente">
-                          <Pencil size={18} />
-                       </button>
-                       <button 
-                        onClick={() => openWhatsApp(c.phone, `Olá ${c.name}, somos da oficina. Tudo bem?`)}
-                        className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-colors" title="Chamar no WhatsApp">
-                          <MessageCircle size={18} />
-                       </button>
-                       <button 
-                        onClick={() => handleOpenHistory(c)}
-                        className="text-blue-500 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Histórico de Manutenção">
-                          <History size={18} />
-                       </button>
-                    </td>
+        <div className="overflow-x-auto">
+           <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                 <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Veículo</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Placa</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
                  </tr>
-              ))}
-              {filteredCustomers.length === 0 && (
-                 <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Nenhum cliente encontrado.</td></tr>
-              )}
-           </tbody>
-        </table>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                 {filteredCustomers.map(c => (
+                    <tr key={c.id}>
+                       <td className="px-6 py-4 font-medium text-gray-900">{c.name}</td>
+                       <td className="px-6 py-4 text-gray-500">{c.phone}</td>
+                       <td className="px-6 py-4">{c.vehicleModel}</td>
+                       <td className="px-6 py-4 font-mono text-sm bg-gray-50 w-min rounded px-2">{c.vehiclePlate}</td>
+                       <td className="px-6 py-4 flex gap-2">
+                          <button 
+                           onClick={() => handleEdit(c)}
+                           className="text-blue-400 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Editar Cliente">
+                             <Pencil size={18} />
+                          </button>
+                          <button 
+                           onClick={() => openWhatsApp(c.phone, `Olá ${c.name}, somos da oficina. Tudo bem?`)}
+                           className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-colors" title="Chamar no WhatsApp">
+                             <MessageCircle size={18} />
+                          </button>
+                          <button 
+                           onClick={() => handleOpenHistory(c)}
+                           className="text-blue-500 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Histórico de Manutenção">
+                             <History size={18} />
+                          </button>
+                       </td>
+                    </tr>
+                 ))}
+                 {filteredCustomers.length === 0 && (
+                    <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Nenhum cliente encontrado.</td></tr>
+                 )}
+              </tbody>
+           </table>
+        </div>
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
            <div className="bg-white rounded-xl p-6 w-full max-w-md">
               <h3 className="text-lg font-bold mb-4">{editingId ? 'Editar Cadastro' : 'Novo Cadastro'}</h3>
               <form onSubmit={handleSave} className="space-y-4">
@@ -1950,7 +1958,7 @@ const CustomersView: React.FC<{ companyId: string }> = ({ companyId }) => {
       )}
 
       {historyModalOpen && selectedHistoryCustomer && (
-         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto">
+         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 overflow-y-auto p-4">
             <div className="bg-white rounded-xl w-full max-w-3xl my-10 max-h-[90vh] flex flex-col">
                <div className="p-6 border-b border-gray-100 flex justify-between items-start bg-slate-50 rounded-t-xl">
                   <div>
@@ -2204,44 +2212,46 @@ const OSView: React.FC<{ companyId: string }> = ({ companyId }) => {
            </div>
 
            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                 <thead className="bg-gray-50">
-                    <tr>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nº OS</th>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente / Veículo</th>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
-                    </tr>
-                 </thead>
-                 <tbody className="divide-y divide-gray-200">
-                    {filteredOrders.map(os => (
-                       <tr key={os.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 font-mono text-sm text-gray-500">#{os.id.split('-')[1]}</td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{new Date(os.createdAt).toLocaleDateString()}</td>
-                          <td className="px-6 py-4">
-                             <div className="font-medium text-gray-900">{os.customerName}</div>
-                             <div className="text-xs text-gray-500">{os.vehicle}</div>
-                          </td>
-                          <td className="px-6 py-4">
-                             <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                os.status === OSStatus.COMPLETED ? 'bg-green-100 text-green-700' : 
-                                os.status === OSStatus.PENDING ? 'bg-yellow-100 text-yellow-700' :
-                                os.status === OSStatus.CANCELED ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                             }`}>
-                                {os.status}
-                             </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-bold text-gray-900">{formatCurrency(os.totalValue)}</td>
-                          <td className="px-6 py-4 flex justify-center gap-2">
-                             <button onClick={() => handleEdit(os)} className="text-blue-500 hover:text-blue-700 p-2"><Pencil size={18}/></button>
-                             <button onClick={() => handlePrint(os)} className="text-gray-500 hover:text-gray-700 p-2"><Printer size={18}/></button>
-                          </td>
+              <div className="overflow-x-auto">
+                 <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                       <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nº OS</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente / Veículo</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                          <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
                        </tr>
-                    ))}
-                 </tbody>
-              </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                       {filteredOrders.map(os => (
+                          <tr key={os.id} className="hover:bg-gray-50">
+                             <td className="px-6 py-4 font-mono text-sm text-gray-500">#{os.id.split('-')[1]}</td>
+                             <td className="px-6 py-4 text-sm text-gray-500">{new Date(os.createdAt).toLocaleDateString()}</td>
+                             <td className="px-6 py-4">
+                                <div className="font-medium text-gray-900">{os.customerName}</div>
+                                <div className="text-xs text-gray-500">{os.vehicle}</div>
+                             </td>
+                             <td className="px-6 py-4">
+                                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                                   os.status === OSStatus.COMPLETED ? 'bg-green-100 text-green-700' : 
+                                   os.status === OSStatus.PENDING ? 'bg-yellow-100 text-yellow-700' :
+                                   os.status === OSStatus.CANCELED ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                                }`}>
+                                   {os.status}
+                                </span>
+                             </td>
+                             <td className="px-6 py-4 text-right font-bold text-gray-900">{formatCurrency(os.totalValue)}</td>
+                             <td className="px-6 py-4 flex justify-center gap-2">
+                                <button onClick={() => handleEdit(os)} className="text-blue-500 hover:text-blue-700 p-2"><Pencil size={18}/></button>
+                                <button onClick={() => handlePrint(os)} className="text-gray-500 hover:text-gray-700 p-2"><Printer size={18}/></button>
+                             </td>
+                          </tr>
+                       ))}
+                    </tbody>
+                 </table>
+              </div>
            </div>
         </div>
      );
@@ -2334,31 +2344,33 @@ const OSView: React.FC<{ companyId: string }> = ({ companyId }) => {
                     </button>
                  </div>
 
-                 <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50 text-gray-500">
-                       <tr>
-                          <th className="px-4 py-2 text-left">Item</th>
-                          <th className="px-4 py-2 text-center">Qtd</th>
-                          <th className="px-4 py-2 text-right">Unit.</th>
-                          <th className="px-4 py-2 text-right">Total</th>
-                          <th className="px-4 py-2"></th>
-                       </tr>
-                    </thead>
-                    <tbody>
-                       {formData.items?.map((item, idx) => (
-                          <tr key={idx} className="border-b last:border-0">
-                             <td className="px-4 py-3">{item.name}</td>
-                             <td className="px-4 py-3 text-center">{item.quantity}</td>
-                             <td className="px-4 py-3 text-right">{formatCurrency(item.unitPrice)}</td>
-                             <td className="px-4 py-3 text-right font-medium">{formatCurrency(item.total)}</td>
-                             <td className="px-4 py-3 text-center">
-                                <button onClick={() => handleRemoveItem(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={16}/></button>
-                             </td>
+                 <div className="overflow-x-auto">
+                    <table className="min-w-full text-sm">
+                       <thead className="bg-gray-50 text-gray-500">
+                          <tr>
+                             <th className="px-4 py-2 text-left">Item</th>
+                             <th className="px-4 py-2 text-center">Qtd</th>
+                             <th className="px-4 py-2 text-right">Unit.</th>
+                             <th className="px-4 py-2 text-right">Total</th>
+                             <th className="px-4 py-2"></th>
                           </tr>
-                       ))}
-                       {!formData.items?.length && <tr><td colSpan={5} className="text-center py-4 text-gray-400">Nenhuma peça adicionada.</td></tr>}
-                    </tbody>
-                 </table>
+                       </thead>
+                       <tbody>
+                          {formData.items?.map((item, idx) => (
+                             <tr key={idx} className="border-b last:border-0">
+                                <td className="px-4 py-3 min-w-[150px]">{item.name}</td>
+                                <td className="px-4 py-3 text-center">{item.quantity}</td>
+                                <td className="px-4 py-3 text-right">{formatCurrency(item.unitPrice)}</td>
+                                <td className="px-4 py-3 text-right font-medium">{formatCurrency(item.total)}</td>
+                                <td className="px-4 py-3 text-center">
+                                   <button onClick={() => handleRemoveItem(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={16}/></button>
+                                </td>
+                             </tr>
+                          ))}
+                          {!formData.items?.length && <tr><td colSpan={5} className="text-center py-4 text-gray-400">Nenhuma peça adicionada.</td></tr>}
+                       </tbody>
+                    </table>
+                 </div>
               </div>
            </div>
 
@@ -2425,7 +2437,7 @@ const OSView: React.FC<{ companyId: string }> = ({ companyId }) => {
         </div>
 
         {showChecklist && checklist && (
-           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
               <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
                  <h3 className="text-lg font-bold mb-4">Vistoria do Veículo</h3>
                  
