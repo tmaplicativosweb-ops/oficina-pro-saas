@@ -20,7 +20,7 @@ export enum CompanyStatus {
 export enum OSStatus {
   PENDING = 'PENDING',
   IN_PROGRESS = 'IN_PROGRESS',
-  WAITING_PARTS = 'WAITING_PARTS', // Adicionado para Kanban
+  WAITING_PARTS = 'WAITING_PARTS',
   COMPLETED = 'COMPLETED',
   CANCELED = 'CANCELED'
 }
@@ -32,16 +32,26 @@ export enum TransactionType {
 
 export enum ChecklistStatus {
   OK = 'OK',
-  DAMAGED = 'DAMAGED', // Avariado
-  MISSING = 'MISSING', // Ausente
-  NA = 'NA' // Não se aplica
+  DAMAGED = 'DAMAGED',
+  MISSING = 'MISSING',
+  NA = 'NA'
 }
 
 export enum AppointmentStatus {
   SCHEDULED = 'SCHEDULED',
   CONFIRMED = 'CONFIRMED',
-  COMPLETED = 'COMPLETED', // Virou OS
+  COMPLETED = 'COMPLETED',
   CANCELED = 'CANCELED'
+}
+
+export interface ChatMessage {
+  id: string;
+  companyId: string;
+  senderRole: 'MASTER' | 'CLIENT';
+  senderName: string;
+  text: string;
+  createdAt: number;
+  read: boolean;
 }
 
 export interface Appointment {
@@ -50,7 +60,7 @@ export interface Appointment {
   customerId: string;
   customerName: string;
   vehicle: string;
-  date: number; // Timestamp
+  date: number;
   description: string;
   status: AppointmentStatus;
 }
@@ -65,7 +75,7 @@ export interface Checklist {
   id: string;
   osId: string;
   companyId: string;
-  fuelLevel: number; // 0 to 4 (0, 1/4, 1/2, 3/4, Full)
+  fuelLevel: number;
   items: ChecklistItem[];
   notes: string;
   updatedAt: number;
@@ -77,7 +87,7 @@ export interface Transaction {
   description: string;
   amount: number;
   type: TransactionType;
-  category: string; // Ex: Aluguel, Peças, Luz, Venda Avulsa
+  category: string;
   date: number;
 }
 
@@ -85,20 +95,20 @@ export interface TeamMember {
   id: string;
   companyId: string;
   name: string;
-  role: string; // Ex: Mecânico, Eletricista, Ajudante
-  commissionRate: number; // Porcentagem (0-100)
+  role: string;
+  commissionRate: number;
   active: boolean;
 }
 
 export interface Company {
   id: string;
   name: string;
-  document: string; // CNPJ
+  document: string;
   email: string;
   phone: string;
-  address?: string; // Novo
-  warrantyTerms?: string; // Novo
-  monthlyGoal?: number; // Novo
+  address?: string;
+  warrantyTerms?: string;
+  monthlyGoal?: number;
   plan: PlanType;
   status: CompanyStatus;
   createdAt: number;
@@ -110,7 +120,7 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  companyId: string | null; // Null for MASTER
+  companyId: string | null;
 }
 
 export interface Customer {
@@ -148,11 +158,11 @@ export interface ServiceOrder {
   vehicle: string;
   description: string;
   status: OSStatus;
-  mechanicId?: string; // Novo: ID do mecânico responsável
-  mechanicName?: string; // Novo: Nome para facilitar exibição
-  laborValue: number; // Valor da Mao de Obra
-  items: OSItem[];    // Lista de pecas
-  totalValue: number; // Soma total
+  mechanicId?: string;
+  mechanicName?: string;
+  laborValue: number;
+  items: OSItem[];
+  totalValue: number;
   createdAt: number;
   updatedAt: number;
 }

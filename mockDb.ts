@@ -3,8 +3,7 @@ import {
   getAuth, 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword, 
-  updateProfile,
-  User as FirebaseUser
+  updateProfile
 } from "firebase/auth";
 import { 
   getFirestore, 
@@ -33,10 +32,10 @@ import {
   Transaction, 
   TeamMember, 
   Checklist, 
-  Appointment 
-} from './types';
+  Appointment,
+  ChatMessage
+} from '../types';
 
-// --- Firebase Configuration ---
 const firebaseConfig = {
   apiKey: "AIzaSyDDm2keXQhi5wH3BVCdgQiMFnu6DTrUzvk",
   authDomain: "oficina-pro-saas.firebaseapp.com",
@@ -53,8 +52,6 @@ const db = getFirestore(app);
 const mapDoc = <T>(doc: any): T => {
   return { id: doc.id, ...doc.data() } as T;
 };
-
-// --- Auth Services ---
 
 export const authService = {
   login: async (email: string, pass: string): Promise<{ user: User, company: Company | null }> => {
@@ -137,8 +134,6 @@ export const authService = {
     return { user: adminUser, company };
   }
 };
-
-// --- Data Services ---
 
 export const dbService = {
   getCompanies: async (): Promise<Company[]> => {
@@ -315,6 +310,25 @@ export const dbService = {
   
   deleteAppointment: async (id: string): Promise<void> => {
     await deleteDoc(doc(db, "appointments", id));
+  },
+
+  // --- CHAT SERVICES ---
+  
+  getChatMessages: async (companyId: string): Promise<ChatMessage[]> => {
+    // Note: ordering requires composite index in real Firestore often, 
+    // but for simple collection queries it works or sorts client side.
+    const q = query(
+      collection(db, "support_messages"), 
+      where("companyId", "==", companyId)
+    );
+    const snapshot = await getDocs(q);
+    const msgs = snapshot.docs.map(d => mapDoc<ChatMessage>(d));
+    return msgs.sort((a, b) => a.createdAt - b.createdAt);
+  },
+
+  sendChatMessage: async (msg: Omit<ChatMessage, 'id'>): Promise<ChatMessage> => {
+    const ref = await addDoc(collection(db, "support_messages"), msg);
+    return { id: ref.id, ...msg };
   },
   
   getStats: async (companyId: string) => {

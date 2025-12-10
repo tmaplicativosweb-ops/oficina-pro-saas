@@ -1,13 +1,136 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { UserRole } from '../types';
-import { LogOut, LayoutDashboard, Users, Wrench, Settings, Building2, AlertTriangle, Package, Briefcase, DollarSign, UserCheck, Calendar, FileText, Menu, X } from 'lucide-react';
+import { UserRole, ChatMessage } from '../types';
+import { dbService } from '../services/mockDb';
+import { LogOut, LayoutDashboard, Users, Wrench, Settings, Building2, AlertTriangle, Package, Briefcase, DollarSign, UserCheck, Calendar, FileText, Menu, X, LifeBuoy, MessageCircle, Mail, Send, MessageSquare } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
   activePage: string;
   onNavigate: (page: string) => void;
 }
+
+const ChatWidget: React.FC = () => {
+  const { user, company } = useAuth();
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputText, setInputText] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const loadMessages = async () => {
+    if (company) {
+      const msgs = await dbService.getChatMessages(company.id);
+      setMessages(msgs);
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      loadMessages();
+      // Poll for messages every 5 seconds when chat is open (since we are not using onSnapshot real-time listener in this mock setup)
+      const interval = setInterval(loadMessages, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [isOpen, company]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputText.trim() || !company || !user) return;
+
+    const newMessage: Omit<ChatMessage, 'id'> = {
+      companyId: company.id,
+      senderRole: 'CLIENT',
+      senderName: user.name,
+      text: inputText,
+      createdAt: Date.now(),
+      read: false
+    };
+
+    await dbService.sendChatMessage(newMessage);
+    setInputText('');
+    loadMessages();
+  };
+
+  if (!company) return null;
+
+  return (
+    <>
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg z-50 flex items-center justify-center transition-transform hover:scale-110"
+        >
+          <MessageSquare size={24} />
+        </button>
+      )}
+
+      {isOpen && (
+        <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-white rounded-2xl shadow-2xl z-50 flex flex-col border border-gray-200 animate-in slide-in-from-bottom-10 fade-in duration-300">
+          <div className="bg-blue-600 p-4 rounded-t-2xl flex justify-between items-center text-white">
+            <div className="flex items-center gap-2">
+               <LifeBuoy size={20} />
+               <h3 className="font-bold">Suporte OficinaPro</h3>
+            </div>
+            <button onClick={() => setIsOpen(false)} className="hover:bg-blue-700 p-1 rounded">
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50 space-y-4">
+            {messages.length === 0 && (
+               <div className="text-center text-gray-400 text-sm mt-10">
+                  <p>Olá! Como podemos ajudar?</p>
+                  <p className="text-xs mt-2">Envie sua dúvida abaixo.</p>
+               </div>
+            )}
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex flex-col ${msg.senderRole === 'CLIENT' ? 'items-end' : 'items-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] p-3 rounded-xl text-sm ${
+                    msg.senderRole === 'CLIENT'
+                      ? 'bg-blue-600 text-white rounded-br-none'
+                      : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm'
+                  }`}
+                >
+                  {msg.text}
+                </div>
+                <span className="text-[10px] text-gray-400 mt-1 px-1">
+                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+              </div>
+            ))}
+            <div ref={messagesEndRef} />
+          </div>
+
+          <form onSubmit={handleSend} className="p-3 border-t bg-white rounded-b-2xl">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                placeholder="Digite sua mensagem..."
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500"
+              />
+              <button
+                type="submit"
+                className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors"
+              >
+                <Send size={18} />
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </>
+  );
+};
 
 export const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate }) => {
   const { user, company, logout } = useAuth();
@@ -209,19 +332,24 @@ export const Layout: React.FC<LayoutProps> = ({ children, activePage, onNavigate
               </div>
             </div>
         </header>
-        <div className="p-4 md:p-8 pb-20">
+        <div className="p-4 md:p-8 pb-20 relative">
           {/* Global License Warning Overlay for functionality */}
           {!isMaster && isExpired && (
-             <div className="bg-red-50 border border-red-200 rounded-xl p-4 md:p-6 mb-6 flex flex-col md:flex-row items-start gap-4">
-               <AlertTriangle className="text-red-600 shrink-0" size={24} />
-               <div>
-                 <h3 className="text-red-800 font-bold text-lg">Licença Expirada</h3>
-                 <p className="text-red-700 text-sm md:text-base">O período de uso da sua empresa expirou. O acesso a novas ações está bloqueado. Por favor, entre em contato com o desenvolvedor para renovar sua licença.</p>
+             <div className="bg-red-50 border border-red-200 rounded-xl p-4 md:p-6 mb-6 flex flex-col md:flex-row items-start gap-4 justify-between">
+               <div className="flex items-start gap-4">
+                  <AlertTriangle className="text-red-600 shrink-0" size={24} />
+                  <div>
+                    <h3 className="text-red-800 font-bold text-lg">Licença Expirada</h3>
+                    <p className="text-red-700 text-sm md:text-base">O período de uso da sua empresa expirou. O acesso a novas ações está bloqueado.</p>
+                  </div>
                </div>
              </div>
           )}
           {children}
         </div>
+        
+        {/* Render Chat Widget only for CLIENT roles */}
+        {!isMaster && <ChatWidget />}
       </main>
     </div>
   );
