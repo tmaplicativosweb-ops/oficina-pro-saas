@@ -17,7 +17,8 @@ import {
   deleteDoc, 
   query, 
   where, 
-  orderBy 
+  orderBy,
+  onSnapshot 
 } from "firebase/firestore";
 import { 
   Company, 
@@ -315,8 +316,6 @@ export const dbService = {
   // --- CHAT SERVICES ---
   
   getChatMessages: async (companyId: string): Promise<ChatMessage[]> => {
-    // Note: ordering requires composite index in real Firestore often, 
-    // but for simple collection queries it works or sorts client side.
     const q = query(
       collection(db, "support_messages"), 
       where("companyId", "==", companyId)
@@ -324,6 +323,19 @@ export const dbService = {
     const snapshot = await getDocs(q);
     const msgs = snapshot.docs.map(d => mapDoc<ChatMessage>(d));
     return msgs.sort((a, b) => a.createdAt - b.createdAt);
+  },
+
+  subscribeToChatMessages: (companyId: string, callback: (msgs: ChatMessage[]) => void) => {
+    const q = query(
+      collection(db, "support_messages"), 
+      where("companyId", "==", companyId)
+    );
+    // Real-time listener
+    return onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map(d => mapDoc<ChatMessage>(d));
+      const sorted = msgs.sort((a, b) => a.createdAt - b.createdAt);
+      callback(sorted);
+    });
   },
 
   sendChatMessage: async (msg: Omit<ChatMessage, 'id'>): Promise<ChatMessage> => {

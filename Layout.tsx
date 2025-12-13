@@ -17,20 +17,17 @@ const ChatWidget: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const loadMessages = async () => {
-    if (company) {
-      const msgs = await dbService.getChatMessages(company.id);
-      setMessages(msgs);
-    }
-  };
-
   useEffect(() => {
-    if (isOpen) {
-      loadMessages();
-      // Poll for messages every 5 seconds when chat is open (since we are not using onSnapshot real-time listener in this mock setup)
-      const interval = setInterval(loadMessages, 5000);
-      return () => clearInterval(interval);
+    let unsubscribe: () => void;
+    if (isOpen && company) {
+      // Use real-time subscription instead of polling
+      unsubscribe = dbService.subscribeToChatMessages(company.id, (msgs) => {
+        setMessages(msgs);
+      });
     }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [isOpen, company]);
 
   useEffect(() => {
@@ -52,7 +49,7 @@ const ChatWidget: React.FC = () => {
 
     await dbService.sendChatMessage(newMessage);
     setInputText('');
-    loadMessages();
+    // No need to reload manually, subscription handles it
   };
 
   if (!company) return null;

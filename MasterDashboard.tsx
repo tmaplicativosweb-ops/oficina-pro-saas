@@ -37,17 +37,16 @@ const SupportChatView: React.FC<{ companies: Company[] }> = ({ companies }) => {
   
   const { user } = useAuth();
 
-  const loadMessages = async () => {
-    if (selectedCompanyId) {
-      const msgs = await dbService.getChatMessages(selectedCompanyId);
-      setMessages(msgs);
-    }
-  };
-
   useEffect(() => {
-    loadMessages();
-    const interval = setInterval(loadMessages, 5000);
-    return () => clearInterval(interval);
+    let unsubscribe: () => void;
+    if (selectedCompanyId) {
+      unsubscribe = dbService.subscribeToChatMessages(selectedCompanyId, (msgs) => {
+        setMessages(msgs);
+      });
+    }
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [selectedCompanyId]);
 
   useEffect(() => {
@@ -69,7 +68,7 @@ const SupportChatView: React.FC<{ companies: Company[] }> = ({ companies }) => {
 
     await dbService.sendChatMessage(newMessage);
     setInputText('');
-    loadMessages();
+    // Subscription updates UI automatically
   };
 
   return (
