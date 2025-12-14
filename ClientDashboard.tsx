@@ -24,10 +24,10 @@ const parseCSV = (text: string) => {
    const separator = firstLine.includes(';') ? ';' : ',';
 
    const headers = firstLine.split(separator).map(h => h.replace(/['"]+/g, '').trim());
-   
+
    const data = lines.slice(1).map(line => {
-       const values = line.split(separator);
-       return values.map(v => v.replace(/['"]+/g, '').trim());
+      const values = line.split(separator);
+      return values.map(v => v.replace(/['"]+/g, '').trim());
    });
 
    return { headers, data };
@@ -109,7 +109,7 @@ const printOrder = (os: ServiceOrder, customer: Customer | undefined, company: C
    if (!printWindow) return;
 
    const dateStr = new Date(os.createdAt).toLocaleDateString();
-   const itemsHtml = os.items && os.items.length > 0 
+   const itemsHtml = os.items && os.items.length > 0
       ? os.items.map(item => `
          <tr>
             <td>${item.name}</td>
@@ -117,20 +117,20 @@ const printOrder = (os: ServiceOrder, customer: Customer | undefined, company: C
             <td style="text-align: right">${formatCurrency(item.unitPrice)}</td>
             <td style="text-align: right">${formatCurrency(item.total)}</td>
          </tr>
-      `).join('') 
+      `).join('')
       : `<tr><td colspan="4" style="text-align: center; color: #999;">Nenhum produto/peça listado.</td></tr>`;
 
    let checklistHtml = '';
    if (checklist) {
       const fuelLabels = ['Vazio', '1/4', '1/2', '3/4', 'Cheio'];
-      
+
       const itemsList = checklist.items.map(i => {
          let color = '#333';
          let statusLabel = 'OK';
-         if(i.status === ChecklistStatus.DAMAGED) { color = 'red'; statusLabel = 'AVARIADO'; }
-         if(i.status === ChecklistStatus.MISSING) { color = 'orange'; statusLabel = 'AUSENTE'; }
-         if(i.status === ChecklistStatus.NA) { color = '#999'; statusLabel = 'N/A'; }
-         
+         if (i.status === ChecklistStatus.DAMAGED) { color = 'red'; statusLabel = 'AVARIADO'; }
+         if (i.status === ChecklistStatus.MISSING) { color = 'orange'; statusLabel = 'AUSENTE'; }
+         if (i.status === ChecklistStatus.NA) { color = '#999'; statusLabel = 'N/A'; }
+
          return `<div style="margin-bottom: 5px;">
             <strong>${i.name}:</strong> <span style="color:${color}; font-weight:bold">${statusLabel}</span>
             ${i.notes ? `<span style="font-size:12px; color:#666">(${i.notes})</span>` : ''}
@@ -280,16 +280,16 @@ const printOrder = (os: ServiceOrder, customer: Customer | undefined, company: C
 };
 
 const StatsCard: React.FC<{ title: string; value: string | number; icon: any; color: string; subtext?: string }> = ({ title, value, icon: Icon, color, subtext }) => (
-  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
-    <div className={`p-4 rounded-full ${color} bg-opacity-10`}>
-      <Icon className={color} size={24} />
-    </div>
-    <div>
-      <p className="text-sm text-gray-500 font-medium">{title}</p>
-      <h4 className="text-2xl font-bold text-gray-800">{value}</h4>
-      {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
-    </div>
-  </div>
+   <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4">
+      <div className={`p-4 rounded-full ${color} bg-opacity-10`}>
+         <Icon className={color} size={24} />
+      </div>
+      <div>
+         <p className="text-sm text-gray-500 font-medium">{title}</p>
+         <h4 className="text-2xl font-bold text-gray-800">{value}</h4>
+         {subtext && <p className="text-xs text-gray-400 mt-1">{subtext}</p>}
+      </div>
+   </div>
 );
 
 const SimpleBarChart: React.FC<{ data: { label: string, value: number }[] }> = ({ data }) => {
@@ -299,14 +299,14 @@ const SimpleBarChart: React.FC<{ data: { label: string, value: number }[] }> = (
          {data.map((d, i) => (
             <div key={i} className="flex flex-col items-center flex-1 group">
                <div className="relative w-full flex justify-end flex-col items-center h-full">
-                   <div 
+                  <div
                      className="w-full max-w-[30px] bg-blue-500 rounded-t-sm hover:bg-blue-600 transition-all relative group-hover:scale-110 origin-bottom duration-300"
                      style={{ height: `${(d.value / max) * 100}%` }}
-                   >
+                  >
                      <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 whitespace-nowrap z-10">
                         {formatCurrency(d.value)}
                      </div>
-                   </div>
+                  </div>
                </div>
                <span className="text-[10px] text-gray-400 mt-2 font-medium">{d.label}</span>
             </div>
@@ -322,10 +322,10 @@ const SimpleDonutChart: React.FC<{ labor: number, parts: number }> = ({ labor, p
 
    return (
       <div className="flex items-center gap-6">
-         <div className="relative w-32 h-32 rounded-full border-[12px] border-blue-500 transform rotate-[-90deg]" 
-              style={{ 
-                 background: `conic-gradient(#3b82f6 ${laborPercent}%, #f97316 0)` 
-              }}>
+         <div className="relative w-32 h-32 rounded-full border-[12px] border-blue-500 transform rotate-[-90deg]"
+            style={{
+               background: `conic-gradient(#3b82f6 ${laborPercent}%, #f97316 0)`
+            }}>
             <div className="absolute inset-0 m-[12px] bg-white rounded-full flex items-center justify-center flex-col transform rotate-[90deg]">
                <span className="text-xs text-gray-400">Total</span>
                <span className="font-bold text-sm text-gray-800">{formatCurrency(total)}</span>
@@ -360,19 +360,19 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
       const now = new Date();
       const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
       const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0);
-      
+
       setStartDate(firstDay.toISOString().split('T')[0]);
       setEndDate(lastDay.toISOString().split('T')[0]);
    }, []);
 
    const getRangeLabel = () => {
-      if(!startDate || !endDate) return 'Período Completo';
+      if (!startDate || !endDate) return 'Período Completo';
       return `${new Date(startDate).toLocaleDateString()} até ${new Date(endDate).toLocaleDateString()}`;
    };
 
    const generateFinancialReport = async () => {
-      if(!startDate || !endDate) return alert("Selecione o período");
-      
+      if (!startDate || !endDate) return alert("Selecione o período");
+
       const [transactions, orders] = await Promise.all([
          dbService.getTransactions(companyId),
          dbService.getServiceOrders(companyId)
@@ -388,12 +388,12 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
          services: ordersFiltered.reduce((acc, o) => acc + o.totalValue, 0),
          other: transFiltered.filter(t => t.type === TransactionType.INCOME).reduce((acc, t) => acc + t.amount, 0)
       };
-      
+
       const expensesByCategory: Record<string, number> = {};
       transFiltered.filter(t => t.type === TransactionType.EXPENSE).forEach(t => {
          expensesByCategory[t.category] = (expensesByCategory[t.category] || 0) + t.amount;
       });
-      const totalExpenses = Object.values(expensesByCategory).reduce((a,b) => a+b, 0);
+      const totalExpenses = Object.values(expensesByCategory).reduce((a, b) => a + b, 0);
 
       const totalRevenue = revenues.services + revenues.other;
       const balance = totalRevenue - totalExpenses;
@@ -451,15 +451,15 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
    };
 
    const generateOSReport = async () => {
-      if(!startDate || !endDate) return alert("Selecione o período");
-      
+      if (!startDate || !endDate) return alert("Selecione o período");
+
       const orders = await dbService.getServiceOrders(companyId);
       const startMs = new Date(startDate).getTime();
       const endMs = new Date(endDate).getTime() + (24 * 60 * 60 * 1000) - 1;
 
       const filtered = orders.filter(o => o.status === OSStatus.COMPLETED && o.updatedAt >= startMs && o.updatedAt <= endMs);
 
-      if(filtered.length === 0) return alert("Nenhuma OS finalizada neste período.");
+      if (filtered.length === 0) return alert("Nenhuma OS finalizada neste período.");
 
       let totalLabor = 0;
       let totalParts = 0;
@@ -523,12 +523,12 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
 
    const generateInventoryReport = async () => {
       const products = await dbService.getProducts(companyId);
-      
+
       let totalItems = 0;
       let totalCost = 0;
       let totalSale = 0;
 
-      const rows = products.sort((a,b) => a.name.localeCompare(b.name)).map(p => {
+      const rows = products.sort((a, b) => a.name.localeCompare(b.name)).map(p => {
          totalItems += p.quantity;
          totalCost += (p.costPrice * p.quantity);
          totalSale += (p.sellPrice * p.quantity);
@@ -585,12 +585,12 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                <FileText className="text-blue-600" /> Central de Relatórios
             </h3>
-            
+
             <div className="bg-blue-50 p-4 rounded-lg mb-6 flex flex-col md:flex-row items-end gap-4 border border-blue-100">
                <div className="flex-1 w-full">
                   <label className="block text-xs font-bold text-blue-800 uppercase mb-1">Data Inicial</label>
-                  <input 
-                     type="date" 
+                  <input
+                     type="date"
                      className="w-full border border-blue-200 rounded p-2 text-sm"
                      value={startDate}
                      onChange={e => setStartDate(e.target.value)}
@@ -598,8 +598,8 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
                </div>
                <div className="flex-1 w-full">
                   <label className="block text-xs font-bold text-blue-800 uppercase mb-1">Data Final</label>
-                  <input 
-                     type="date" 
+                  <input
+                     type="date"
                      className="w-full border border-blue-200 rounded p-2 text-sm"
                      value={endDate}
                      onChange={e => setEndDate(e.target.value)}
@@ -610,49 +610,49 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                <div className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow flex flex-col items-center text-center">
                   <div className="bg-green-100 p-4 rounded-full mb-4 text-green-600">
-                     <DollarSign size={32}/>
+                     <DollarSign size={32} />
                   </div>
                   <h4 className="font-bold text-gray-800 mb-2">Relatório Financeiro</h4>
                   <p className="text-xs text-gray-500 mb-6">
                      DRE Simples contendo receitas de serviços, entradas manuais e despesas categorizadas. Ideal para contabilidade.
                   </p>
-                  <button 
+                  <button
                      onClick={generateFinancialReport}
                      className="mt-auto w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-lg text-sm font-bold transition-colors"
                   >
-                     <Printer size={16}/> Gerar PDF
+                     <Printer size={16} /> Gerar PDF
                   </button>
                </div>
 
                <div className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow flex flex-col items-center text-center">
                   <div className="bg-blue-100 p-4 rounded-full mb-4 text-blue-600">
-                     <Wrench size={32}/>
+                     <Wrench size={32} />
                   </div>
                   <h4 className="font-bold text-gray-800 mb-2">Relatório de Serviços</h4>
                   <p className="text-xs text-gray-500 mb-6">
                      Listagem detalhada de todas as Ordens de Serviço finalizadas no período, separando Mão de Obra e Peças.
                   </p>
-                  <button 
+                  <button
                      onClick={generateOSReport}
                      className="mt-auto w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-lg text-sm font-bold transition-colors"
                   >
-                     <Printer size={16}/> Gerar PDF
+                     <Printer size={16} /> Gerar PDF
                   </button>
                </div>
 
                <div className="border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow flex flex-col items-center text-center">
                   <div className="bg-orange-100 p-4 rounded-full mb-4 text-orange-600">
-                     <Package size={32}/>
+                     <Package size={32} />
                   </div>
                   <h4 className="font-bold text-gray-800 mb-2">Balanço de Estoque</h4>
                   <p className="text-xs text-gray-500 mb-6">
                      Posição atual do estoque valorada pelo preço de custo. (Nota: Este relatório ignora o filtro de data, mostrando o estado atual).
                   </p>
-                  <button 
+                  <button
                      onClick={generateInventoryReport}
                      className="mt-auto w-full flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-lg text-sm font-bold transition-colors"
                   >
-                     <Printer size={16}/> Gerar PDF
+                     <Printer size={16} /> Gerar PDF
                   </button>
                </div>
             </div>
@@ -662,132 +662,131 @@ const ReportsView: React.FC<{ companyId: string }> = ({ companyId }) => {
 };
 
 const HomeView: React.FC<{ companyId: string }> = ({ companyId }) => {
-  const [data, setData] = useState<any>(null);
-  const { company } = useAuth();
+   const [data, setData] = useState<any>(null);
+   const { company } = useAuth();
 
-  useEffect(() => {
-    dbService.getStats(companyId).then(setData);
-  }, [companyId]);
+   useEffect(() => {
+      dbService.getStats(companyId).then(setData);
+   }, [companyId]);
 
-  if (!data) return <div className="p-10 text-center text-gray-400">Carregando painel de indicadores...</div>;
+   if (!data) return <div className="p-10 text-center text-gray-400">Carregando painel de indicadores...</div>;
 
-  const { summary, history, split, ranking } = data;
-  const goal = company?.monthlyGoal || 10000;
-  const progress = Math.min((summary.revenue / goal) * 100, 100);
+   const { summary, history, split, ranking } = data;
+   const goal = company?.monthlyGoal || 10000;
+   const progress = Math.min((summary.revenue / goal) * 100, 100);
 
-  return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-         <StatsCard 
-            title="Receita do Mês" 
-            value={formatCurrency(summary.revenue)} 
-            icon={DollarSign} 
-            color="text-green-600" 
-            subtext={`${progress.toFixed(0)}% da meta mensal`}
-         />
-         <StatsCard 
-            title="OS em Aberto" 
-            value={summary.pendingOS} 
-            icon={Clock} 
-            color="text-yellow-600" 
-            subtext="Aguardando ação"
-         />
-         <StatsCard 
-            title="OS Finalizadas" 
-            value={summary.completedOS} 
-            icon={CheckCircle} 
-            color="text-blue-600"
-            subtext="Total acumulado" 
-         />
-         <StatsCard 
-            title="Ticket Médio" 
-            value={formatCurrency(summary.avgTicket)} 
-            icon={TrendingUp} 
-            color="text-purple-600" 
-            subtext="Por veículo atendido"
-         />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-         <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-center mb-6">
-               <h4 className="font-bold text-gray-800 flex items-center gap-2"><BarChart3 size={20} className="text-blue-600"/> Histórico de Faturamento</h4>
-               <span className="text-xs text-gray-400">Últimos 6 meses</span>
-            </div>
-            <SimpleBarChart data={history} />
+   return (
+      <div className="space-y-6">
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <StatsCard
+               title="Receita do Mês"
+               value={formatCurrency(summary.revenue)}
+               icon={DollarSign}
+               color="text-green-600"
+               subtext={`${progress.toFixed(0)}% da meta mensal`}
+            />
+            <StatsCard
+               title="OS em Aberto"
+               value={summary.pendingOS}
+               icon={Clock}
+               color="text-yellow-600"
+               subtext="Aguardando ação"
+            />
+            <StatsCard
+               title="OS Finalizadas"
+               value={summary.completedOS}
+               icon={CheckCircle}
+               color="text-blue-600"
+               subtext="Total acumulado"
+            />
+            <StatsCard
+               title="Ticket Médio"
+               value={formatCurrency(summary.avgTicket)}
+               icon={TrendingUp}
+               color="text-purple-600"
+               subtext="Por veículo atendido"
+            />
          </div>
 
-         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-            <div className="flex justify-between items-center mb-6">
-               <h4 className="font-bold text-gray-800 flex items-center gap-2"><PieChart size={20} className="text-orange-500"/> Faturamento por Categoria</h4>
-            </div>
-            <div className="flex justify-center h-40 items-center">
-               <SimpleDonutChart labor={split.labor} parts={split.parts} />
-            </div>
-         </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-             <h4 className="font-bold text-gray-800 flex items-center gap-2 mb-4"><Trophy size={20} className="text-yellow-500"/> Ranking de Mecânicos</h4>
-             <div className="space-y-3">
-                {ranking.length === 0 ? (
-                   <p className="text-sm text-gray-400 text-center py-4">Nenhum dado de produção.</p>
-                ) : (
-                   ranking.map((r: any, idx: number) => (
-                      <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                         <div className="flex items-center gap-3">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
-                               idx === 0 ? 'bg-yellow-100 text-yellow-700' : 
-                               idx === 1 ? 'bg-gray-200 text-gray-600' :
-                               idx === 2 ? 'bg-orange-100 text-orange-700' : 'bg-white border text-gray-400'
-                            }`}>
-                               {idx + 1}
-                            </div>
-                            <span className="font-medium text-gray-700">{r.name}</span>
-                         </div>
-                         <span className="font-bold text-gray-900">{formatCurrency(r.value)}</span>
-                      </div>
-                   ))
-                )}
-             </div>
-         </div>
-
-         <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
-            <h4 className="font-bold text-gray-800 mb-4">Meta Mensal</h4>
-            
-            <div className="flex justify-between items-end mb-2">
-               <div>
-                  <p className="text-3xl font-bold text-gray-900">{progress.toFixed(0)}%</p>
-                  <p className="text-sm text-gray-500">do objetivo de {formatCurrency(goal)}</p>
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+               <div className="flex justify-between items-center mb-6">
+                  <h4 className="font-bold text-gray-800 flex items-center gap-2"><BarChart3 size={20} className="text-blue-600" /> Histórico de Faturamento</h4>
+                  <span className="text-xs text-gray-400">Últimos 6 meses</span>
                </div>
-               <div className={`p-3 rounded-full ${progress >= 100 ? 'bg-green-100 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
-                  <TrendingUp size={24} />
+               <SimpleBarChart data={history} />
+            </div>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+               <div className="flex justify-between items-center mb-6">
+                  <h4 className="font-bold text-gray-800 flex items-center gap-2"><PieChart size={20} className="text-orange-500" /> Faturamento por Categoria</h4>
+               </div>
+               <div className="flex justify-center h-40 items-center">
+                  <SimpleDonutChart labor={split.labor} parts={split.parts} />
                </div>
             </div>
-            
-            <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
-               <div 
-                  className={`h-full transition-all duration-1000 ${progress >= 100 ? 'bg-green-500' : 'bg-blue-600'}`} 
-                  style={{ width: `${progress}%` }}
-               >
-                  {progress >= 100 && <div className="w-full h-full bg-white/20 animate-pulse"></div>}
+         </div>
+
+         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+               <h4 className="font-bold text-gray-800 flex items-center gap-2 mb-4"><Trophy size={20} className="text-yellow-500" /> Ranking de Mecânicos</h4>
+               <div className="space-y-3">
+                  {ranking.length === 0 ? (
+                     <p className="text-sm text-gray-400 text-center py-4">Nenhum dado de produção.</p>
+                  ) : (
+                     ranking.map((r: any, idx: number) => (
+                        <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                           <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${idx === 0 ? 'bg-yellow-100 text-yellow-700' :
+                                 idx === 1 ? 'bg-gray-200 text-gray-600' :
+                                    idx === 2 ? 'bg-orange-100 text-orange-700' : 'bg-white border text-gray-400'
+                                 }`}>
+                                 {idx + 1}
+                              </div>
+                              <span className="font-medium text-gray-700">{r.name}</span>
+                           </div>
+                           <span className="font-bold text-gray-900">{formatCurrency(r.value)}</span>
+                        </div>
+                     ))
+                  )}
                </div>
             </div>
-            <p className="text-xs text-center text-gray-400 mt-4">
-               {progress >= 100 ? 'Parabéns! Meta batida! 🚀' : `Faltam ${formatCurrency(Math.max(0, goal - summary.revenue))} para atingir a meta.`}
-            </p>
+
+            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex flex-col justify-center">
+               <h4 className="font-bold text-gray-800 mb-4">Meta Mensal</h4>
+
+               <div className="flex justify-between items-end mb-2">
+                  <div>
+                     <p className="text-3xl font-bold text-gray-900">{progress.toFixed(0)}%</p>
+                     <p className="text-sm text-gray-500">do objetivo de {formatCurrency(goal)}</p>
+                  </div>
+                  <div className={`p-3 rounded-full ${progress >= 100 ? 'bg-green-100 text-green-600' : 'bg-blue-50 text-blue-600'}`}>
+                     <TrendingUp size={24} />
+                  </div>
+               </div>
+
+               <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                  <div
+                     className={`h-full transition-all duration-1000 ${progress >= 100 ? 'bg-green-500' : 'bg-blue-600'}`}
+                     style={{ width: `${progress}%` }}
+                  >
+                     {progress >= 100 && <div className="w-full h-full bg-white/20 animate-pulse"></div>}
+                  </div>
+               </div>
+               <p className="text-xs text-center text-gray-400 mt-4">
+                  {progress >= 100 ? 'Parabéns! Meta batida! 🚀' : `Faltam ${formatCurrency(Math.max(0, goal - summary.revenue))} para atingir a meta.`}
+               </p>
+            </div>
          </div>
       </div>
-    </div>
-  );
+   );
 };
 
 const FinancialView: React.FC<{ companyId: string }> = ({ companyId }) => {
    const [transactions, setTransactions] = useState<Transaction[]>([]);
    const [osRevenue, setOsRevenue] = useState(0);
    const [showModal, setShowModal] = useState(false);
-   
+
    const [newTrans, setNewTrans] = useState({
       description: '',
       amount: '',
@@ -824,7 +823,7 @@ const FinancialView: React.FC<{ companyId: string }> = ({ companyId }) => {
    };
 
    const handleDelete = async (id: string) => {
-      if(window.confirm("Apagar este registro?")) {
+      if (window.confirm("Apagar este registro?")) {
          await dbService.deleteTransaction(id);
          load();
       }
@@ -833,7 +832,7 @@ const FinancialView: React.FC<{ companyId: string }> = ({ companyId }) => {
    const manualIncome = transactions
       .filter(t => t.type === TransactionType.INCOME)
       .reduce((acc, curr) => acc + curr.amount, 0);
-   
+
    const manualExpense = transactions
       .filter(t => t.type === TransactionType.EXPENSE)
       .reduce((acc, curr) => acc + curr.amount, 0);
@@ -881,7 +880,7 @@ const FinancialView: React.FC<{ companyId: string }> = ({ companyId }) => {
                   <Plus size={18} /> Novo Lançamento
                </button>
             </div>
-            
+
             <table className="min-w-full">
                <thead className="bg-gray-50">
                   <tr>
@@ -923,36 +922,36 @@ const FinancialView: React.FC<{ companyId: string }> = ({ companyId }) => {
                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Tipo</label>
                         <div className="flex gap-2">
-                           <button 
-                              type="button" 
-                              onClick={() => setNewTrans({...newTrans, type: TransactionType.EXPENSE})} 
+                           <button
+                              type="button"
+                              onClick={() => setNewTrans({ ...newTrans, type: TransactionType.EXPENSE })}
                               className={`flex-1 py-2 rounded font-bold border ${newTrans.type === TransactionType.EXPENSE ? 'bg-red-50 border-red-200 text-red-600' : 'bg-white text-gray-400 border-gray-200'}`}
                            >
                               Despesa (Saída)
                            </button>
-                           <button 
-                              type="button" 
-                              onClick={() => setNewTrans({...newTrans, type: TransactionType.INCOME})} 
+                           <button
+                              type="button"
+                              onClick={() => setNewTrans({ ...newTrans, type: TransactionType.INCOME })}
                               className={`flex-1 py-2 rounded font-bold border ${newTrans.type === TransactionType.INCOME ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white text-gray-400 border-gray-200'}`}
                            >
                               Receita (Entrada)
                            </button>
                         </div>
                      </div>
-                     
+
                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Descrição</label>
-                        <input className="w-full border p-2 rounded" placeholder="Ex: Aluguel, Venda de Sucata..." required value={newTrans.description} onChange={e => setNewTrans({...newTrans, description: e.target.value})} />
+                        <input className="w-full border p-2 rounded" placeholder="Ex: Aluguel, Venda de Sucata..." required value={newTrans.description} onChange={e => setNewTrans({ ...newTrans, description: e.target.value })} />
                      </div>
-                     
+
                      <div className="grid grid-cols-2 gap-4">
                         <div>
                            <label className="block text-xs font-medium text-gray-500 mb-1">Valor (R$)</label>
-                           <input type="number" step="0.01" className="w-full border p-2 rounded" placeholder="0.00" required value={newTrans.amount} onChange={e => setNewTrans({...newTrans, amount: e.target.value})} />
+                           <input type="number" step="0.01" className="w-full border p-2 rounded" placeholder="0.00" required value={newTrans.amount} onChange={e => setNewTrans({ ...newTrans, amount: e.target.value })} />
                         </div>
                         <div>
                            <label className="block text-xs font-medium text-gray-500 mb-1">Categoria</label>
-                           <select className="w-full border p-2 rounded" value={newTrans.category} onChange={e => setNewTrans({...newTrans, category: e.target.value})}>
+                           <select className="w-full border p-2 rounded" value={newTrans.category} onChange={e => setNewTrans({ ...newTrans, category: e.target.value })}>
                               <option>Despesa Geral</option>
                               <option>Aluguel</option>
                               <option>Energia/Água</option>
@@ -981,11 +980,11 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
    const [showModal, setShowModal] = useState(false);
    const [editingId, setEditingId] = useState<string | null>(null);
    const [customers, setCustomers] = useState<Customer[]>([]);
-   
+
    const [newAppt, setNewAppt] = useState({
       customerId: '',
-      dateStr: '', 
-      timeStr: '', 
+      dateStr: '',
+      timeStr: '',
       description: ''
    });
 
@@ -1001,14 +1000,14 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
    const handleEdit = (appt: Appointment) => {
       setEditingId(appt.id);
       const d = new Date(appt.date);
-      const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      const dateStr = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
       const timeStr = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      
+
       setNewAppt({
-          customerId: appt.customerId,
-          dateStr,
-          timeStr,
-          description: appt.description
+         customerId: appt.customerId,
+         dateStr,
+         timeStr,
+         description: appt.description
       });
       setShowModal(true);
    };
@@ -1016,10 +1015,10 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
    const handleSave = async (e: React.FormEvent) => {
       e.preventDefault();
       const cust = customers.find(c => c.id === newAppt.customerId);
-      if(!cust) return;
+      if (!cust) return;
 
       const fullDate = new Date(`${newAppt.dateStr}T${newAppt.timeStr}`);
-      
+
       if (editingId) {
          await dbService.updateAppointment(editingId, {
             customerId: cust.id,
@@ -1047,14 +1046,14 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
    };
 
    const handleDelete = async (id: string) => {
-      if(window.confirm('Cancelar este agendamento?')) {
+      if (window.confirm('Cancelar este agendamento?')) {
          await dbService.deleteAppointment(id);
          load();
       }
    };
 
    const handleConvertToOS = async (appt: Appointment) => {
-      if(window.confirm('Converter este agendamento em Ordem de Serviço Pendente?')) {
+      if (window.confirm('Converter este agendamento em Ordem de Serviço Pendente?')) {
          await dbService.createServiceOrder({
             companyId,
             customerId: appt.customerId,
@@ -1066,7 +1065,7 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
             items: [],
             totalValue: 0
          });
-         
+
          await dbService.updateAppointmentStatus(appt.id, AppointmentStatus.COMPLETED);
          onNavigate('os');
       }
@@ -1074,7 +1073,7 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
 
    const today = new Date();
    const days = [];
-   for(let i=0; i<6; i++) {
+   for (let i = 0; i < 6; i++) {
       const d = new Date();
       d.setDate(today.getDate() + i);
       days.push(d);
@@ -1083,11 +1082,11 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
    const getAppointmentsForDay = (date: Date) => {
       return appointments.filter(a => {
          const apptDate = new Date(a.date);
-         return apptDate.getDate() === date.getDate() && 
-                apptDate.getMonth() === date.getMonth() &&
-                apptDate.getFullYear() === date.getFullYear() &&
-                a.status !== AppointmentStatus.COMPLETED && 
-                a.status !== AppointmentStatus.CANCELED; 
+         return apptDate.getDate() === date.getDate() &&
+            apptDate.getMonth() === date.getMonth() &&
+            apptDate.getFullYear() === date.getFullYear() &&
+            a.status !== AppointmentStatus.COMPLETED &&
+            a.status !== AppointmentStatus.CANCELED;
       }).sort((a, b) => a.date - b.date);
    };
 
@@ -1113,7 +1112,7 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
                         <div className="uppercase text-xs opacity-70">{weekDayName}</div>
                         <div className="text-lg">{dateStr}</div>
                      </div>
-                     
+
                      <div className="p-2 space-y-3 flex-1">
                         {dayAppointments.length === 0 && (
                            <div className="text-center py-10 text-gray-300 text-sm">Livre</div>
@@ -1125,19 +1124,19 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
                                     {new Date(app.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                                  </span>
                                  <div className="flex gap-1">
-                                    <button onClick={() => handleEdit(app)} className="text-gray-300 hover:text-blue-500"><Pencil size={14}/></button>
-                                    <button onClick={() => handleDelete(app.id)} className="text-gray-300 hover:text-red-400"><XCircle size={14}/></button>
+                                    <button onClick={() => handleEdit(app)} className="text-gray-300 hover:text-blue-500"><Pencil size={14} /></button>
+                                    <button onClick={() => handleDelete(app.id)} className="text-gray-300 hover:text-red-400"><XCircle size={14} /></button>
                                  </div>
                               </div>
                               <h4 className="font-bold text-gray-800 text-sm mt-2">{app.vehicle}</h4>
                               <p className="text-xs text-gray-500 mb-2 truncate">{app.customerName}</p>
                               <p className="text-xs bg-gray-50 p-1 rounded mb-3">{app.description}</p>
-                              
-                              <button 
+
+                              <button
                                  onClick={() => handleConvertToOS(app)}
                                  className="w-full py-1.5 text-xs bg-green-50 text-green-700 hover:bg-green-100 rounded font-bold flex items-center justify-center gap-1"
                               >
-                                 Abrir OS <ArrowRight size={12}/>
+                                 Abrir OS <ArrowRight size={12} />
                               </button>
                            </div>
                         ))}
@@ -1154,11 +1153,11 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
                   <form onSubmit={handleSave} className="space-y-4">
                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Cliente / Veículo</label>
-                        <select 
-                           className="w-full border p-2 rounded" 
-                           required 
-                           value={newAppt.customerId} 
-                           onChange={e => setNewAppt({...newAppt, customerId: e.target.value})}
+                        <select
+                           className="w-full border p-2 rounded"
+                           required
+                           value={newAppt.customerId}
+                           onChange={e => setNewAppt({ ...newAppt, customerId: e.target.value })}
                         >
                            <option value="">Selecione um cliente...</option>
                            {customers.map(c => <option key={c.id} value={c.id}>{c.name} - {c.vehicleModel} ({c.vehiclePlate})</option>)}
@@ -1167,16 +1166,16 @@ const AgendaView: React.FC<{ companyId: string, onNavigate: (page: string) => vo
                      <div className="grid grid-cols-2 gap-4">
                         <div>
                            <label className="block text-xs font-medium text-gray-500 mb-1">Data</label>
-                           <input type="date" className="w-full border p-2 rounded" required value={newAppt.dateStr} onChange={e => setNewAppt({...newAppt, dateStr: e.target.value})} />
+                           <input type="date" className="w-full border p-2 rounded" required value={newAppt.dateStr} onChange={e => setNewAppt({ ...newAppt, dateStr: e.target.value })} />
                         </div>
                         <div>
                            <label className="block text-xs font-medium text-gray-500 mb-1">Hora</label>
-                           <input type="time" className="w-full border p-2 rounded" required value={newAppt.timeStr} onChange={e => setNewAppt({...newAppt, timeStr: e.target.value})} />
+                           <input type="time" className="w-full border p-2 rounded" required value={newAppt.timeStr} onChange={e => setNewAppt({ ...newAppt, timeStr: e.target.value })} />
                         </div>
                      </div>
                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Descrição do Serviço</label>
-                        <input className="w-full border p-2 rounded" placeholder="Ex: Troca de óleo..." required value={newAppt.description} onChange={e => setNewAppt({...newAppt, description: e.target.value})} />
+                        <input className="w-full border p-2 rounded" placeholder="Ex: Troca de óleo..." required value={newAppt.description} onChange={e => setNewAppt({ ...newAppt, description: e.target.value })} />
                      </div>
 
                      <div className="flex gap-2 justify-end mt-6">
@@ -1195,7 +1194,7 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
    const [members, setMembers] = useState<TeamMember[]>([]);
    const [showModal, setShowModal] = useState(false);
    const [newMember, setNewMember] = useState({ name: '', role: 'Mecânico', commissionRate: 30 });
-   
+
    const [reportData, setReportData] = useState<Record<string, number>>({});
 
    const load = async () => {
@@ -1204,11 +1203,11 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
 
       const osList = await dbService.getServiceOrders(companyId);
       const production: Record<string, number> = {};
-      
+
       osList.forEach(os => {
          if (os.status === OSStatus.COMPLETED && os.mechanicId) {
-             const commission = (os.laborValue || 0); 
-             production[os.mechanicId] = (production[os.mechanicId] || 0) + commission;
+            const commission = (os.laborValue || 0);
+            production[os.mechanicId] = (production[os.mechanicId] || 0) + commission;
          }
       });
       setReportData(production);
@@ -1231,7 +1230,7 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
    };
 
    const handleDelete = async (id: string) => {
-      if(window.confirm('Remover este funcionário?')) {
+      if (window.confirm('Remover este funcionário?')) {
          await dbService.deleteTeamMember(id);
          load();
       }
@@ -1262,7 +1261,7 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
                   {members.map(m => {
                      const laborTotal = reportData[m.id] || 0;
                      const commissionValue = laborTotal * (m.commissionRate / 100);
-                     
+
                      return (
                         <tr key={m.id}>
                            <td className="px-6 py-4 font-medium text-gray-900 flex items-center gap-2">
@@ -1276,7 +1275,7 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
                            <td className="px-6 py-4 text-gray-500">{formatCurrency(laborTotal)}</td>
                            <td className="px-6 py-4 font-bold text-green-600">{formatCurrency(commissionValue)}</td>
                            <td className="px-6 py-4 text-center">
-                              <button onClick={() => handleDelete(m.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={16}/></button>
+                              <button onClick={() => handleDelete(m.id)} className="text-gray-400 hover:text-red-500"><Trash2 size={16} /></button>
                            </td>
                         </tr>
                      );
@@ -1287,9 +1286,9 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
                </tbody>
             </table>
          </div>
-         
+
          <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 text-sm text-blue-800">
-            <p className="flex items-center gap-2 font-bold mb-1"><UserCheck size={16}/> Como funciona?</p>
+            <p className="flex items-center gap-2 font-bold mb-1"><UserCheck size={16} /> Como funciona?</p>
             <p>A comissão é calculada automaticamente com base no valor da <strong>Mão de Obra</strong> das Ordens de Serviço concluídas onde o funcionário foi marcado como responsável.</p>
          </div>
 
@@ -1300,15 +1299,15 @@ const TeamView: React.FC<{ companyId: string }> = ({ companyId }) => {
                   <form onSubmit={handleSave} className="space-y-4">
                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Nome Completo</label>
-                        <input className="w-full border p-2 rounded" required value={newMember.name} onChange={e => setNewMember({...newMember, name: e.target.value})} />
+                        <input className="w-full border p-2 rounded" required value={newMember.name} onChange={e => setNewMember({ ...newMember, name: e.target.value })} />
                      </div>
                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Cargo</label>
-                        <input className="w-full border p-2 rounded" required value={newMember.role} onChange={e => setNewMember({...newMember, role: e.target.value})} />
+                        <input className="w-full border p-2 rounded" required value={newMember.role} onChange={e => setNewMember({ ...newMember, role: e.target.value })} />
                      </div>
                      <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Taxa de Comissão (%)</label>
-                        <input type="number" max="100" min="0" className="w-full border p-2 rounded" required value={newMember.commissionRate} onChange={e => setNewMember({...newMember, commissionRate: parseInt(e.target.value)})} />
+                        <input type="number" max="100" min="0" className="w-full border p-2 rounded" required value={newMember.commissionRate} onChange={e => setNewMember({ ...newMember, commissionRate: parseInt(e.target.value) })} />
                         <p className="text-xs text-gray-400 mt-1">Porcentagem sobre a mão de obra.</p>
                      </div>
                      <div className="flex gap-2 justify-end mt-6">
@@ -1362,37 +1361,37 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
          const text = event.target?.result as string;
          const result = parseCSV(text);
          if (result) {
-             setHeaders(result.headers);
-             setCsvData(result.data);
-             const newMapping: Record<string, string> = {};
-             const lowerHeaders = result.headers.map(h => h.toLowerCase());
-             
-             if (importMode === 'customers') {
-                 const nameIdx = lowerHeaders.findIndex(h => h.includes('nome') || h.includes('name') || h.includes('cliente'));
-                 if (nameIdx >= 0) newMapping['name'] = result.headers[nameIdx];
-                 
-                 const phoneIdx = lowerHeaders.findIndex(h => h.includes('tel') || h.includes('cel') || h.includes('fone') || h.includes('whatsapp') || h.includes('phone'));
-                 if (phoneIdx >= 0) newMapping['phone'] = result.headers[phoneIdx];
+            setHeaders(result.headers);
+            setCsvData(result.data);
+            const newMapping: Record<string, string> = {};
+            const lowerHeaders = result.headers.map(h => h.toLowerCase());
 
-                 const modelIdx = lowerHeaders.findIndex(h => h.includes('modelo') || h.includes('veículo') || h.includes('carro'));
-                 if (modelIdx >= 0) newMapping['vehicleModel'] = result.headers[modelIdx];
+            if (importMode === 'customers') {
+               const nameIdx = lowerHeaders.findIndex(h => h.includes('nome') || h.includes('name') || h.includes('cliente'));
+               if (nameIdx >= 0) newMapping['name'] = result.headers[nameIdx];
 
-                 const plateIdx = lowerHeaders.findIndex(h => h.includes('placa') || h.includes('plate'));
-                 if (plateIdx >= 0) newMapping['vehiclePlate'] = result.headers[plateIdx];
-             } else if (importMode === 'products') {
-                 const nameIdx = lowerHeaders.findIndex(h => h.includes('nome') || h.includes('desc') || h.includes('produto') || h.includes('peça'));
-                 if (nameIdx >= 0) newMapping['name'] = result.headers[nameIdx];
-                 
-                 const costIdx = lowerHeaders.findIndex(h => h.includes('custo') || h.includes('compra') || h.includes('cost'));
-                 if (costIdx >= 0) newMapping['costPrice'] = result.headers[costIdx];
+               const phoneIdx = lowerHeaders.findIndex(h => h.includes('tel') || h.includes('cel') || h.includes('fone') || h.includes('whatsapp') || h.includes('phone'));
+               if (phoneIdx >= 0) newMapping['phone'] = result.headers[phoneIdx];
 
-                 const sellIdx = lowerHeaders.findIndex(h => h.includes('venda') || h.includes('preço') || h.includes('valor') || h.includes('price'));
-                 if (sellIdx >= 0) newMapping['sellPrice'] = result.headers[sellIdx];
-                 
-                 const qtdIdx = lowerHeaders.findIndex(h => h.includes('qtd') || h.includes('quant') || h.includes('estoque'));
-                 if (qtdIdx >= 0) newMapping['quantity'] = result.headers[qtdIdx];
-             }
-             setMapping(newMapping);
+               const modelIdx = lowerHeaders.findIndex(h => h.includes('modelo') || h.includes('veículo') || h.includes('carro'));
+               if (modelIdx >= 0) newMapping['vehicleModel'] = result.headers[modelIdx];
+
+               const plateIdx = lowerHeaders.findIndex(h => h.includes('placa') || h.includes('plate'));
+               if (plateIdx >= 0) newMapping['vehiclePlate'] = result.headers[plateIdx];
+            } else if (importMode === 'products') {
+               const nameIdx = lowerHeaders.findIndex(h => h.includes('nome') || h.includes('desc') || h.includes('produto') || h.includes('peça'));
+               if (nameIdx >= 0) newMapping['name'] = result.headers[nameIdx];
+
+               const costIdx = lowerHeaders.findIndex(h => h.includes('custo') || h.includes('compra') || h.includes('cost'));
+               if (costIdx >= 0) newMapping['costPrice'] = result.headers[costIdx];
+
+               const sellIdx = lowerHeaders.findIndex(h => h.includes('venda') || h.includes('preço') || h.includes('valor') || h.includes('price'));
+               if (sellIdx >= 0) newMapping['sellPrice'] = result.headers[sellIdx];
+
+               const qtdIdx = lowerHeaders.findIndex(h => h.includes('qtd') || h.includes('quant') || h.includes('estoque'));
+               if (qtdIdx >= 0) newMapping['quantity'] = result.headers[qtdIdx];
+            }
+            setMapping(newMapping);
          }
       };
       reader.readAsText(file);
@@ -1401,47 +1400,47 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
    const executeImport = async () => {
       if (!importMode) return;
       setIsImporting(true);
-      
+
       let count = 0;
       for (const row of csvData) {
-          const getVal = (field: string) => {
-              const headerName = mapping[field];
-              const idx = headers.indexOf(headerName);
-              if (idx === -1) return '';
-              return row[idx] || '';
-          };
+         const getVal = (field: string) => {
+            const headerName = mapping[field];
+            const idx = headers.indexOf(headerName);
+            if (idx === -1) return '';
+            return row[idx] || '';
+         };
 
-          if (importMode === 'customers') {
-              const name = getVal('name');
-              const phone = getVal('phone');
-              if (name) {
-                  await dbService.createCustomer({
-                      companyId,
-                      name,
-                      phone,
-                      vehicleModel: getVal('vehicleModel') || 'Não informado',
-                      vehiclePlate: getVal('vehiclePlate') || ''
-                  });
-                  count++;
-              }
-          } else if (importMode === 'products') {
-              const name = getVal('name');
-              if (name) {
-                  const cleanMoney = (str: string) => {
-                      if (!str) return 0;
-                      return parseFloat(str.replace('R$', '').replace(/\./g, '').replace(',', '.')) || 0;
-                  };
-                  
-                  await dbService.createProduct({
-                      companyId,
-                      name,
-                      costPrice: cleanMoney(getVal('costPrice')),
-                      sellPrice: cleanMoney(getVal('sellPrice')),
-                      quantity: parseInt(getVal('quantity')) || 0
-                  });
-                  count++;
-              }
-          }
+         if (importMode === 'customers') {
+            const name = getVal('name');
+            const phone = getVal('phone');
+            if (name) {
+               await dbService.createCustomer({
+                  companyId,
+                  name,
+                  phone,
+                  vehicleModel: getVal('vehicleModel') || 'Não informado',
+                  vehiclePlate: getVal('vehiclePlate') || ''
+               });
+               count++;
+            }
+         } else if (importMode === 'products') {
+            const name = getVal('name');
+            if (name) {
+               const cleanMoney = (str: string) => {
+                  if (!str) return 0;
+                  return parseFloat(str.replace('R$', '').replace(/\./g, '').replace(',', '.')) || 0;
+               };
+
+               await dbService.createProduct({
+                  companyId,
+                  name,
+                  costPrice: cleanMoney(getVal('costPrice')),
+                  sellPrice: cleanMoney(getVal('sellPrice')),
+                  quantity: parseInt(getVal('quantity')) || 0
+               });
+               count++;
+            }
+         }
       }
 
       setIsImporting(false);
@@ -1450,13 +1449,35 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
       alert(`${count} registros importados com sucesso!`);
    };
 
+   const handleExport = async () => {
+      if (!window.confirm("Gerar backup completo dos dados? Isso pode levar alguns segundos.")) return;
+
+      try {
+         const data = await dbService.exportData(companyId);
+         const json = JSON.stringify(data, null, 2);
+         const blob = new Blob([json], { type: 'application/json' });
+         const url = URL.createObjectURL(blob);
+
+         const a = document.createElement('a');
+         a.href = url;
+         a.download = `backup-oficina-${new Date().toISOString().split('T')[0]}.json`;
+         document.body.appendChild(a);
+         a.click();
+         document.body.removeChild(a);
+         URL.revokeObjectURL(url);
+      } catch (err) {
+         console.error(err);
+         alert("Erro ao gerar backup.");
+      }
+   };
+
    return (
       <div className="max-w-3xl mx-auto space-y-8">
          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
                <Building2 size={20} className="text-blue-600" /> Dados da Oficina
             </h3>
-            
+
             <form onSubmit={handleSave} className="space-y-6">
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -1469,30 +1490,30 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
                   </div>
                   <div>
                      <label className="block text-sm font-medium text-gray-700 mb-1">Telefone / WhatsApp</label>
-                     <input 
-                        value={formData.phone} 
-                        onChange={e => setFormData({...formData, phone: e.target.value})} 
-                        className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" 
+                     <input
+                        value={formData.phone}
+                        onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
                         placeholder="(00) 00000-0000"
                      />
                   </div>
                   <div>
                      <label className="block text-sm font-medium text-gray-700 mb-1">Meta Mensal de Faturamento (R$)</label>
-                     <input 
+                     <input
                         type="number"
-                        value={formData.monthlyGoal} 
-                        onChange={e => setFormData({...formData, monthlyGoal: parseFloat(e.target.value)})} 
-                        className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" 
+                        value={formData.monthlyGoal}
+                        onChange={e => setFormData({ ...formData, monthlyGoal: parseFloat(e.target.value) })}
+                        className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
                      />
                   </div>
                </div>
-               
+
                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Endereço Completo</label>
-                  <input 
-                     value={formData.address} 
-                     onChange={e => setFormData({...formData, address: e.target.value})} 
-                     className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none" 
+                  <input
+                     value={formData.address}
+                     onChange={e => setFormData({ ...formData, address: e.target.value })}
+                     className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
                      placeholder="Rua Exemplo, 123 - Bairro - Cidade/UF"
                   />
                   <p className="text-xs text-gray-400 mt-1">Aparecerá no cabeçalho da OS impressa.</p>
@@ -1500,17 +1521,17 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
 
                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Termos de Garantia (Rodapé da OS)</label>
-                  <textarea 
-                     value={formData.warrantyTerms} 
-                     onChange={e => setFormData({...formData, warrantyTerms: e.target.value})} 
-                     className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none h-24" 
+                  <textarea
+                     value={formData.warrantyTerms}
+                     onChange={e => setFormData({ ...formData, warrantyTerms: e.target.value })}
+                     className="w-full border p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none h-24"
                      placeholder="Texto padrão de garantia..."
                   />
                </div>
 
                <div className="flex justify-end pt-4 border-t border-gray-100">
-                  <button 
-                     type="submit" 
+                  <button
+                     type="submit"
                      disabled={loading}
                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2"
                   >
@@ -1522,143 +1543,162 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
          </div>
 
          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-             <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                <FileSpreadsheet size={20} className="text-green-600" /> Importação de Dados (CSV)
             </h3>
-            
+
             {!importMode ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button 
-                        onClick={() => setImportMode('customers')}
-                        className="border border-gray-200 rounded-lg p-6 hover:bg-blue-50 hover:border-blue-200 transition-colors flex flex-col items-center text-center"
-                    >
-                        <div className="bg-blue-100 p-3 rounded-full mb-3 text-blue-600"><User size={24}/></div>
-                        <h4 className="font-bold text-gray-800">Importar Clientes</h4>
-                        <p className="text-xs text-gray-500 mt-1">Planilhas com Nome, Telefone, Placa...</p>
-                    </button>
-                    <button 
-                        onClick={() => setImportMode('products')}
-                        className="border border-gray-200 rounded-lg p-6 hover:bg-orange-50 hover:border-orange-200 transition-colors flex flex-col items-center text-center"
-                    >
-                        <div className="bg-orange-100 p-3 rounded-full mb-3 text-orange-600"><Package size={24}/></div>
-                        <h4 className="font-bold text-gray-800">Importar Estoque</h4>
-                        <p className="text-xs text-gray-500 mt-1">Planilhas com Nome, Custo, Preço, Qtd...</p>
-                    </button>
-                </div>
+               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                     onClick={() => setImportMode('customers')}
+                     className="border border-gray-200 rounded-lg p-6 hover:bg-blue-50 hover:border-blue-200 transition-colors flex flex-col items-center text-center"
+                  >
+                     <div className="bg-blue-100 p-3 rounded-full mb-3 text-blue-600"><User size={24} /></div>
+                     <h4 className="font-bold text-gray-800">Importar Clientes</h4>
+                     <p className="text-xs text-gray-500 mt-1">Planilhas com Nome, Telefone, Placa...</p>
+                  </button>
+                  <button
+                     onClick={() => setImportMode('products')}
+                     className="border border-gray-200 rounded-lg p-6 hover:bg-orange-50 hover:border-orange-200 transition-colors flex flex-col items-center text-center"
+                  >
+                     <div className="bg-orange-100 p-3 rounded-full mb-3 text-orange-600"><Package size={24} /></div>
+                     <h4 className="font-bold text-gray-800">Importar Estoque</h4>
+                     <p className="text-xs text-gray-500 mt-1">Planilhas com Nome, Custo, Preço, Qtd...</p>
+                  </button>
+               </div>
             ) : (
-                <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                        <h4 className="font-semibold text-gray-700">
-                           Importando: {importMode === 'customers' ? 'Clientes' : 'Produtos'}
-                        </h4>
-                        <button onClick={() => { setImportMode(null); setCsvData([]); }} className="text-sm text-red-500 hover:underline">Cancelar</button>
-                    </div>
+               <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                     <h4 className="font-semibold text-gray-700">
+                        Importando: {importMode === 'customers' ? 'Clientes' : 'Produtos'}
+                     </h4>
+                     <button onClick={() => { setImportMode(null); setCsvData([]); }} className="text-sm text-red-500 hover:underline">Cancelar</button>
+                  </div>
 
-                    {!csvData.length ? (
-                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
-                            <Upload className="mx-auto text-gray-400 mb-2" size={32}/>
-                            <p className="text-sm text-gray-600 mb-4">Clique para selecionar seu arquivo .CSV</p>
-                            <input type="file" accept=".csv" onChange={handleFileUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
-                            <p className="text-xs text-gray-400 mt-4">
-                               Dica: O sistema tentará reconhecer colunas como "Nome", "Telefone", "Preço", etc. automaticamente.
-                            </p>
+                  {!csvData.length ? (
+                     <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center bg-gray-50">
+                        <Upload className="mx-auto text-gray-400 mb-2" size={32} />
+                        <p className="text-sm text-gray-600 mb-4">Clique para selecionar seu arquivo .CSV</p>
+                        <input type="file" accept=".csv" onChange={handleFileUpload} className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                        <p className="text-xs text-gray-400 mt-4">
+                           Dica: O sistema tentará reconhecer colunas como "Nome", "Telefone", "Preço", etc. automaticamente.
+                        </p>
+                     </div>
+                  ) : (
+                     <div className="space-y-4">
+                        <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 flex items-start gap-2">
+                           <CheckCircle size={16} className="shrink-0 mt-0.5" />
+                           <div>
+                              <p className="font-bold">Arquivo carregado! {csvData.length} registros encontrados.</p>
+                              <p>Confira abaixo se as colunas foram identificadas corretamente:</p>
+                           </div>
                         </div>
-                    ) : (
-                        <div className="space-y-4">
-                            <div className="bg-blue-50 p-4 rounded-lg text-sm text-blue-800 flex items-start gap-2">
-                                <CheckCircle size={16} className="shrink-0 mt-0.5"/>
-                                <div>
-                                    <p className="font-bold">Arquivo carregado! {csvData.length} registros encontrados.</p>
-                                    <p>Confira abaixo se as colunas foram identificadas corretamente:</p>
-                                </div>
-                            </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {importMode === 'customers' && (
-                                    <>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Nome (Obrigatório)</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['name']} onChange={e => setMapping({...mapping, name: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Telefone</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['phone']} onChange={e => setMapping({...mapping, phone: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Modelo Veículo</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['vehicleModel']} onChange={e => setMapping({...mapping, vehicleModel: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Placa</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['vehiclePlate']} onChange={e => setMapping({...mapping, vehiclePlate: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                    </>
-                                )}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           {importMode === 'customers' && (
+                              <>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Nome (Obrigatório)</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['name']} onChange={e => setMapping({ ...mapping, name: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Telefone</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['phone']} onChange={e => setMapping({ ...mapping, phone: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Modelo Veículo</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['vehicleModel']} onChange={e => setMapping({ ...mapping, vehicleModel: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Coluna Placa</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['vehiclePlate']} onChange={e => setMapping({ ...mapping, vehiclePlate: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                              </>
+                           )}
 
-                                {importMode === 'products' && (
-                                    <>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nome da Peça (Obrigatório)</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['name']} onChange={e => setMapping({...mapping, name: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Preço de Custo (Obrigatório)</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['costPrice']} onChange={e => setMapping({...mapping, costPrice: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Preço de Venda (Obrigatório)</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['sellPrice']} onChange={e => setMapping({...mapping, sellPrice: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Quantidade em Estoque (Obrigatório)</label>
-                                            <select className="w-full border p-2 rounded" value={mapping['quantity']} onChange={e => setMapping({...mapping, quantity: e.target.value})}>
-                                                <option value="">Selecione...</option>
-                                                {headers.map(h => <option key={h} value={h}>{h}</option>)}
-                                            </select>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                            
-                            <div className="flex justify-end pt-4">
-                                <button 
-                                    onClick={executeImport}
-                                    disabled={
-                                       isImporting ||
-                                       (importMode === 'customers' && !mapping['name']) ||
-                                       (importMode === 'products' && (!mapping['name'] || !mapping['costPrice'] || !mapping['sellPrice'] || !mapping['quantity']))
-                                    }
-                                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    {isImporting ? <Loader2 className="animate-spin" size={18}/> : <Check size={18}/>}
-                                    {isImporting ? 'Importando...' : 'Confirmar Importação'}
-                                </button>
-                            </div>
+                           {importMode === 'products' && (
+                              <>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Nome da Peça (Obrigatório)</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['name']} onChange={e => setMapping({ ...mapping, name: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Preço de Custo (Obrigatório)</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['costPrice']} onChange={e => setMapping({ ...mapping, costPrice: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Preço de Venda (Obrigatório)</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['sellPrice']} onChange={e => setMapping({ ...mapping, sellPrice: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                                 <div>
+                                    <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Quantidade em Estoque (Obrigatório)</label>
+                                    <select className="w-full border p-2 rounded" value={mapping['quantity']} onChange={e => setMapping({ ...mapping, quantity: e.target.value })}>
+                                       <option value="">Selecione...</option>
+                                       {headers.map(h => <option key={h} value={h}>{h}</option>)}
+                                    </select>
+                                 </div>
+                              </>
+                           )}
                         </div>
-                    )}
-                </div>
+
+                        <div className="flex justify-end pt-4">
+                           <button
+                              onClick={executeImport}
+                              disabled={
+                                 isImporting ||
+                                 (importMode === 'customers' && !mapping['name']) ||
+                                 (importMode === 'products' && (!mapping['name'] || !mapping['costPrice'] || !mapping['sellPrice'] || !mapping['quantity']))
+                              }
+                              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-bold flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                           >
+                              {isImporting ? <Loader2 className="animate-spin" size={18} /> : <Check size={18} />}
+                              {isImporting ? 'Importando...' : 'Confirmar Importação'}
+                           </button>
+                        </div>
+                     </div>
+                  )}
+               </div>
             )}
+         </div>
+
+         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <h3 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+               <Download size={20} className="text-purple-600" /> Backup e Exportação
+            </h3>
+
+            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+               <div>
+                  <p className="text-gray-600 mb-2">Faça o download de todos os seus dados (Clientes, OS, Financeiro) em formato JSON.</p>
+                  <p className="text-xs text-gray-400">Recomendamos fazer isso semanalmente para sua segurança.</p>
+               </div>
+               <button
+                  onClick={handleExport}
+                  className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg font-bold flex items-center gap-2 whitespace-nowrap"
+               >
+                  <Download size={18} /> Fazer Backup Completo
+               </button>
+            </div>
          </div>
       </div>
    );
@@ -1666,7 +1706,7 @@ const SettingsView: React.FC<{ companyId: string }> = ({ companyId }) => {
 
 const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
    const [products, setProducts] = useState<Product[]>([]);
-   const [searchTerm, setSearchTerm] = useState(''); 
+   const [searchTerm, setSearchTerm] = useState('');
    const [showModal, setShowModal] = useState(false);
    const [editingId, setEditingId] = useState<string | null>(null);
    const [newProd, setNewProd] = useState({ name: '', costPrice: '', sellPrice: '', quantity: '' });
@@ -1687,7 +1727,7 @@ const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
 
    const handleSave = async (e: React.FormEvent) => {
       e.preventDefault();
-      
+
       const prodData = {
          name: newProd.name,
          costPrice: parseFloat(newProd.costPrice) || 0,
@@ -1703,7 +1743,7 @@ const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
             ...prodData
          });
       }
-      
+
       setShowModal(false);
       setNewProd({ name: '', costPrice: '', sellPrice: '', quantity: '' });
       setEditingId(null);
@@ -1711,13 +1751,13 @@ const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
    };
 
    const handleDelete = async (id: string) => {
-      if(window.confirm('Tem certeza que deseja remover este produto?')) {
+      if (window.confirm('Tem certeza que deseja remover este produto?')) {
          await dbService.deleteProduct(id);
          load();
       }
    }
 
-   const filteredProducts = products.filter(p => 
+   const filteredProducts = products.filter(p =>
       p.name.toLowerCase().includes(searchTerm.toLowerCase())
    );
 
@@ -1728,9 +1768,9 @@ const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
             <div className="flex gap-2 w-full md:w-auto">
                <div className="relative flex-1 md:w-64">
                   <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                  <input 
-                     type="text" 
-                     placeholder="Buscar peça..." 
+                  <input
+                     type="text"
+                     placeholder="Buscar peça..."
                      className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
                      value={searchTerm}
                      onChange={e => setSearchTerm(e.target.value)}
@@ -1782,778 +1822,776 @@ const InventoryView: React.FC<{ companyId: string }> = ({ companyId }) => {
          </div>
 
          {showModal && (
-         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl p-6 w-full max-w-md">
-               <h3 className="text-lg font-bold mb-4">{editingId ? 'Editar Peça' : 'Cadastrar Peça'}</h3>
-               <form onSubmit={handleSave} className="space-y-4">
-                  <div>
-                     <label className="block text-xs font-medium text-gray-500 mb-1">Nome da Peça</label>
-                     <input className="w-full border p-2 rounded" placeholder="Ex: Filtro de Óleo" required value={newProd.name} onChange={e => setNewProd({...newProd, name: e.target.value})} />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+               <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                  <h3 className="text-lg font-bold mb-4">{editingId ? 'Editar Peça' : 'Cadastrar Peça'}</h3>
+                  <form onSubmit={handleSave} className="space-y-4">
                      <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Preço Custo (R$)</label>
-                        <input type="number" step="0.01" className="w-full border p-2 rounded" placeholder="0.00" required value={newProd.costPrice} onChange={e => setNewProd({...newProd, costPrice: e.target.value})} />
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Nome da Peça</label>
+                        <input className="w-full border p-2 rounded" placeholder="Ex: Filtro de Óleo" required value={newProd.name} onChange={e => setNewProd({ ...newProd, name: e.target.value })} />
+                     </div>
+                     <div className="grid grid-cols-2 gap-4">
+                        <div>
+                           <label className="block text-xs font-medium text-gray-500 mb-1">Preço Custo (R$)</label>
+                           <input type="number" step="0.01" className="w-full border p-2 rounded" placeholder="0.00" required value={newProd.costPrice} onChange={e => setNewProd({ ...newProd, costPrice: e.target.value })} />
+                        </div>
+                        <div>
+                           <label className="block text-xs font-medium text-gray-500 mb-1">Preço Venda (R$)</label>
+                           <input type="number" step="0.01" className="w-full border p-2 rounded" placeholder="0.00" required value={newProd.sellPrice} onChange={e => setNewProd({ ...newProd, sellPrice: e.target.value })} />
+                        </div>
                      </div>
                      <div>
-                        <label className="block text-xs font-medium text-gray-500 mb-1">Preço Venda (R$)</label>
-                        <input type="number" step="0.01" className="w-full border p-2 rounded" placeholder="0.00" required value={newProd.sellPrice} onChange={e => setNewProd({...newProd, sellPrice: e.target.value})} />
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Quantidade Inicial</label>
+                        <input type="number" className="w-full border p-2 rounded" placeholder="0" required value={newProd.quantity} onChange={e => setNewProd({ ...newProd, quantity: e.target.value })} />
                      </div>
-                  </div>
-                  <div>
-                     <label className="block text-xs font-medium text-gray-500 mb-1">Quantidade Inicial</label>
-                     <input type="number" className="w-full border p-2 rounded" placeholder="0" required value={newProd.quantity} onChange={e => setNewProd({...newProd, quantity: e.target.value})} />
-                  </div>
-                  <div className="flex gap-2 justify-end mt-6">
-                     <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
-                     <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Salvar</button>
-                  </div>
-               </form>
+                     <div className="flex gap-2 justify-end mt-6">
+                        <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Salvar</button>
+                     </div>
+                  </form>
+               </div>
             </div>
-         </div>
          )}
       </div>
    );
 };
 
 const CustomersView: React.FC<{ companyId: string }> = ({ companyId }) => {
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [searchTerm, setSearchTerm] = useState(''); 
-  const [showModal, setShowModal] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [newCust, setNewCust] = useState({ name: '', phone: '', vehicleModel: '', vehiclePlate: '' });
+   const [customers, setCustomers] = useState<Customer[]>([]);
+   const [searchTerm, setSearchTerm] = useState('');
+   const [showModal, setShowModal] = useState(false);
+   const [editingId, setEditingId] = useState<string | null>(null);
+   const [newCust, setNewCust] = useState({ name: '', phone: '', vehicleModel: '', vehiclePlate: '' });
 
-  const [historyModalOpen, setHistoryModalOpen] = useState(false);
-  const [selectedHistoryCustomer, setSelectedHistoryCustomer] = useState<Customer | null>(null);
-  const [customerOrders, setCustomerOrders] = useState<ServiceOrder[]>([]);
+   const [historyModalOpen, setHistoryModalOpen] = useState(false);
+   const [selectedHistoryCustomer, setSelectedHistoryCustomer] = useState<Customer | null>(null);
+   const [customerOrders, setCustomerOrders] = useState<ServiceOrder[]>([]);
 
-  const load = () => dbService.getCustomers(companyId).then(setCustomers);
-  useEffect(() => { load(); }, [companyId]);
+   const load = () => dbService.getCustomers(companyId).then(setCustomers);
+   useEffect(() => { load(); }, [companyId]);
 
-  const handleEdit = (cust: Customer) => {
+   const handleEdit = (cust: Customer) => {
       setEditingId(cust.id);
       setNewCust({
-          name: cust.name,
-          phone: cust.phone,
-          vehicleModel: cust.vehicleModel,
-          vehiclePlate: cust.vehiclePlate
+         name: cust.name,
+         phone: cust.phone,
+         vehicleModel: cust.vehicleModel,
+         vehiclePlate: cust.vehiclePlate
       });
       setShowModal(true);
-  };
+   };
 
-  const handleSave = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (editingId) {
-        await dbService.updateCustomer(editingId, newCust);
-    } else {
-        await dbService.createCustomer({ ...newCust, companyId });
-    }
-    setShowModal(false);
-    setNewCust({ name: '', phone: '', vehicleModel: '', vehiclePlate: '' });
-    setEditingId(null);
-    load();
-  };
+   const handleSave = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (editingId) {
+         await dbService.updateCustomer(editingId, newCust);
+      } else {
+         await dbService.createCustomer({ ...newCust, companyId });
+      }
+      setShowModal(false);
+      setNewCust({ name: '', phone: '', vehicleModel: '', vehiclePlate: '' });
+      setEditingId(null);
+      load();
+   };
 
-  const handleOpenHistory = async (customer: Customer) => {
-     setSelectedHistoryCustomer(customer);
-     setHistoryModalOpen(true);
-     const allOrders = await dbService.getServiceOrders(companyId);
-     const usersOrders = allOrders
+   const handleOpenHistory = async (customer: Customer) => {
+      setSelectedHistoryCustomer(customer);
+      setHistoryModalOpen(true);
+      const allOrders = await dbService.getServiceOrders(companyId);
+      const usersOrders = allOrders
          .filter(o => o.customerId === customer.id)
          .sort((a, b) => b.createdAt - a.createdAt);
-     setCustomerOrders(usersOrders);
-  };
+      setCustomerOrders(usersOrders);
+   };
 
-  const filteredCustomers = customers.filter(c => 
-     c.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-     c.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
-     c.phone.includes(searchTerm)
-  );
+   const filteredCustomers = customers.filter(c =>
+      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.vehiclePlate.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.phone.includes(searchTerm)
+   );
 
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-         <h3 className="text-lg font-bold text-gray-800">Clientes e Veículos</h3>
-         <div className="flex gap-2 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-               <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-               <input 
-                  type="text" 
-                  placeholder="Nome, placa ou telefone..." 
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                  value={searchTerm}
-                  onChange={e => setSearchTerm(e.target.value)}
-               />
-            </div>
-            <button onClick={() => { setEditingId(null); setNewCust({ name: '', phone: '', vehicleModel: '', vehiclePlate: '' }); setShowModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shrink-0">
-               <Plus size={18} /> <span className="hidden sm:inline">Novo Cliente</span>
-            </button>
-         </div>
-      </div>
-
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-           <thead className="bg-gray-50">
-              <tr>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Veículo</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Placa</th>
-                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
-              </tr>
-           </thead>
-           <tbody className="divide-y divide-gray-200">
-              {filteredCustomers.map(c => (
-                 <tr key={c.id}>
-                    <td className="px-6 py-4 font-medium text-gray-900">{c.name}</td>
-                    <td className="px-6 py-4 text-gray-500">{c.phone}</td>
-                    <td className="px-6 py-4">{c.vehicleModel}</td>
-                    <td className="px-6 py-4 font-mono text-sm bg-gray-50 w-min rounded px-2">{c.vehiclePlate}</td>
-                    <td className="px-6 py-4 flex gap-2">
-                       <button 
-                        onClick={() => handleEdit(c)}
-                        className="text-blue-400 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Editar Cliente">
-                          <Pencil size={18} />
-                       </button>
-                       <button 
-                        onClick={() => openWhatsApp(c.phone, `Olá ${c.name}, somos da oficina. Tudo bem?`)}
-                        className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-colors" title="Chamar no WhatsApp">
-                          <MessageCircle size={18} />
-                       </button>
-                       <button 
-                        onClick={() => handleOpenHistory(c)}
-                        className="text-blue-500 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Histórico de Manutenção">
-                          <History size={18} />
-                       </button>
-                    </td>
-                 </tr>
-              ))}
-              {filteredCustomers.length === 0 && (
-                 <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Nenhum cliente encontrado.</td></tr>
-              )}
-           </tbody>
-        </table>
-      </div>
-
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-              <h3 className="text-lg font-bold mb-4">{editingId ? 'Editar Cadastro' : 'Novo Cadastro'}</h3>
-              <form onSubmit={handleSave} className="space-y-4">
-                 <input className="w-full border p-2 rounded" placeholder="Nome Completo" required value={newCust.name} onChange={e => setNewCust({...newCust, name: e.target.value})} />
-                 <input className="w-full border p-2 rounded" placeholder="Telefone (WhatsApp) ex: 11999998888" required value={newCust.phone} onChange={e => setNewCust({...newCust, phone: e.target.value})} />
-                 <input className="w-full border p-2 rounded" placeholder="Modelo do Veículo" required value={newCust.vehicleModel} onChange={e => setNewCust({...newCust, vehicleModel: e.target.value})} />
-                 <input className="w-full border p-2 rounded uppercase" placeholder="Placa" required value={newCust.vehiclePlate} onChange={e => setNewCust({...newCust, vehiclePlate: e.target.value})} />
-                 <div className="flex gap-2 justify-end mt-6">
-                    <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
-                    <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Salvar</button>
-                 </div>
-              </form>
-           </div>
-        </div>
-      )}
-
-      {historyModalOpen && selectedHistoryCustomer && (
-         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl w-full max-w-3xl my-10 max-h-[90vh] flex flex-col">
-               <div className="p-6 border-b border-gray-100 flex justify-between items-start bg-slate-50 rounded-t-xl">
-                  <div>
-                     <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <History className="text-blue-600"/> Histórico de Manutenção
-                     </h3>
-                     <p className="text-sm text-gray-500 mt-1">
-                        {selectedHistoryCustomer.name} • {selectedHistoryCustomer.vehicleModel} ({selectedHistoryCustomer.vehiclePlate})
-                     </p>
-                  </div>
-                  <button onClick={() => setHistoryModalOpen(false)} className="text-gray-400 hover:text-gray-600">
-                     <XCircle size={24} />
-                  </button>
+   return (
+      <div className="space-y-6">
+         <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <h3 className="text-lg font-bold text-gray-800">Clientes e Veículos</h3>
+            <div className="flex gap-2 w-full md:w-auto">
+               <div className="relative flex-1 md:w-64">
+                  <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                  <input
+                     type="text"
+                     placeholder="Nome, placa ou telefone..."
+                     className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+                     value={searchTerm}
+                     onChange={e => setSearchTerm(e.target.value)}
+                  />
                </div>
-               
-               <div className="p-6 overflow-y-auto bg-gray-50/50">
-                  {customerOrders.length === 0 ? (
-                     <div className="text-center py-10 text-gray-400">
-                        <Car size={48} className="mx-auto mb-2 opacity-20" />
-                        <p>Nenhum serviço registrado para este veículo.</p>
+               <button onClick={() => { setEditingId(null); setNewCust({ name: '', phone: '', vehicleModel: '', vehiclePlate: '' }); setShowModal(true); }} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shrink-0">
+                  <Plus size={18} /> <span className="hidden sm:inline">Novo Cliente</span>
+               </button>
+            </div>
+         </div>
+
+         <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200">
+               <thead className="bg-gray-50">
+                  <tr>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Telefone</th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Veículo</th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Placa</th>
+                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Ações</th>
+                  </tr>
+               </thead>
+               <tbody className="divide-y divide-gray-200">
+                  {filteredCustomers.map(c => (
+                     <tr key={c.id}>
+                        <td className="px-6 py-4 font-medium text-gray-900">{c.name}</td>
+                        <td className="px-6 py-4 text-gray-500">{c.phone}</td>
+                        <td className="px-6 py-4">{c.vehicleModel}</td>
+                        <td className="px-6 py-4 font-mono text-sm bg-gray-50 w-min rounded px-2">{c.vehiclePlate}</td>
+                        <td className="px-6 py-4 flex gap-2">
+                           <button
+                              onClick={() => handleEdit(c)}
+                              className="text-blue-400 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Editar Cliente">
+                              <Pencil size={18} />
+                           </button>
+                           <button
+                              onClick={() => openWhatsApp(c.phone, `Olá ${c.name}, somos da oficina. Tudo bem?`)}
+                              className="text-green-500 hover:text-green-600 bg-green-50 p-2 rounded-full transition-colors" title="Chamar no WhatsApp">
+                              <MessageCircle size={18} />
+                           </button>
+                           <button
+                              onClick={() => handleOpenHistory(c)}
+                              className="text-blue-500 hover:text-blue-600 bg-blue-50 p-2 rounded-full transition-colors" title="Histórico de Manutenção">
+                              <History size={18} />
+                           </button>
+                        </td>
+                     </tr>
+                  ))}
+                  {filteredCustomers.length === 0 && (
+                     <tr><td colSpan={5} className="px-6 py-8 text-center text-gray-500">Nenhum cliente encontrado.</td></tr>
+                  )}
+               </tbody>
+            </table>
+         </div>
+
+         {showModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+               <div className="bg-white rounded-xl p-6 w-full max-w-md">
+                  <h3 className="text-lg font-bold mb-4">{editingId ? 'Editar Cadastro' : 'Novo Cadastro'}</h3>
+                  <form onSubmit={handleSave} className="space-y-4">
+                     <input className="w-full border p-2 rounded" placeholder="Nome Completo" required value={newCust.name} onChange={e => setNewCust({ ...newCust, name: e.target.value })} />
+                     <input className="w-full border p-2 rounded" placeholder="Telefone (WhatsApp) ex: 11999998888" required value={newCust.phone} onChange={e => setNewCust({ ...newCust, phone: e.target.value })} />
+                     <input className="w-full border p-2 rounded" placeholder="Modelo do Veículo" required value={newCust.vehicleModel} onChange={e => setNewCust({ ...newCust, vehicleModel: e.target.value })} />
+                     <input className="w-full border p-2 rounded uppercase" placeholder="Placa" required value={newCust.vehiclePlate} onChange={e => setNewCust({ ...newCust, vehiclePlate: e.target.value })} />
+                     <div className="flex gap-2 justify-end mt-6">
+                        <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
+                        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Salvar</button>
                      </div>
-                  ) : (
-                     <div className="relative border-l-2 border-blue-200 ml-4 space-y-8">
-                        {customerOrders.map(order => (
-                           <div key={order.id} className="relative pl-8">
-                              <div className="absolute -left-[9px] top-0 w-4 h-4 bg-blue-500 rounded-full border-4 border-white shadow-sm"></div>
-                              
-                              <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
-                                 <div className="flex justify-between items-start mb-2">
-                                    <div>
-                                       <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">
-                                          {new Date(order.createdAt).toLocaleDateString()}
+                  </form>
+               </div>
+            </div>
+         )}
+
+         {historyModalOpen && selectedHistoryCustomer && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+               <div className="bg-white rounded-xl w-full max-w-3xl my-10 max-h-[90vh] flex flex-col">
+                  <div className="p-6 border-b border-gray-100 flex justify-between items-start bg-slate-50 rounded-t-xl">
+                     <div>
+                        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                           <History className="text-blue-600" /> Histórico de Manutenção
+                        </h3>
+                        <p className="text-sm text-gray-500 mt-1">
+                           {selectedHistoryCustomer.name} • {selectedHistoryCustomer.vehicleModel} ({selectedHistoryCustomer.vehiclePlate})
+                        </p>
+                     </div>
+                     <button onClick={() => setHistoryModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+                        <XCircle size={24} />
+                     </button>
+                  </div>
+
+                  <div className="p-6 overflow-y-auto bg-gray-50/50">
+                     {customerOrders.length === 0 ? (
+                        <div className="text-center py-10 text-gray-400">
+                           <Car size={48} className="mx-auto mb-2 opacity-20" />
+                           <p>Nenhum serviço registrado para este veículo.</p>
+                        </div>
+                     ) : (
+                        <div className="relative border-l-2 border-blue-200 ml-4 space-y-8">
+                           {customerOrders.map(order => (
+                              <div key={order.id} className="relative pl-8">
+                                 <div className="absolute -left-[9px] top-0 w-4 h-4 bg-blue-500 rounded-full border-4 border-white shadow-sm"></div>
+
+                                 <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                                    <div className="flex justify-between items-start mb-2">
+                                       <div>
+                                          <span className="text-xs font-bold text-blue-600 uppercase tracking-wide">
+                                             {new Date(order.createdAt).toLocaleDateString()}
+                                          </span>
+                                          <h4 className="font-bold text-gray-800 mt-1">
+                                             {order.description}
+                                          </h4>
+                                       </div>
+                                       <span className={`px-2 py-1 rounded text-xs font-bold ${order.status === OSStatus.COMPLETED ? 'bg-green-100 text-green-700' :
+                                          'bg-gray-100 text-gray-500'
+                                          }`}>
+                                          {order.status}
                                        </span>
-                                       <h4 className="font-bold text-gray-800 mt-1">
-                                          {order.description}
-                                       </h4>
                                     </div>
-                                    <span className={`px-2 py-1 rounded text-xs font-bold ${
-                                       order.status === OSStatus.COMPLETED ? 'bg-green-100 text-green-700' :
-                                       'bg-gray-100 text-gray-500'
-                                    }`}>
-                                       {order.status}
-                                    </span>
-                                 </div>
 
-                                 {order.items && order.items.length > 0 && (
-                                    <div className="mt-3 bg-slate-50 rounded p-3 text-sm">
-                                       <p className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center">
-                                          <Package size={12} className="mr-1"/> Peças Utilizadas
-                                       </p>
-                                       <ul className="space-y-1">
-                                          {order.items.map((item, idx) => (
-                                             <li key={idx} className="flex justify-between text-gray-700">
-                                                <span>{item.quantity}x {item.name}</span>
-                                                <span className="text-gray-400 text-xs">{formatCurrency(item.total)}</span>
-                                             </li>
-                                          ))}
-                                       </ul>
+                                    {order.items && order.items.length > 0 && (
+                                       <div className="mt-3 bg-slate-50 rounded p-3 text-sm">
+                                          <p className="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center">
+                                             <Package size={12} className="mr-1" /> Peças Utilizadas
+                                          </p>
+                                          <ul className="space-y-1">
+                                             {order.items.map((item, idx) => (
+                                                <li key={idx} className="flex justify-between text-gray-700">
+                                                   <span>{item.quantity}x {item.name}</span>
+                                                   <span className="text-gray-400 text-xs">{formatCurrency(item.total)}</span>
+                                                </li>
+                                             ))}
+                                          </ul>
+                                       </div>
+                                    )}
+
+                                    <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
+                                       <span className="text-xs text-gray-400">OS #{order.id.split('-')[1]}</span>
+                                       <span className="font-bold text-gray-900">{formatCurrency(order.totalValue)}</span>
                                     </div>
-                                 )}
-
-                                 <div className="mt-3 pt-3 border-t border-gray-100 flex justify-between items-center">
-                                    <span className="text-xs text-gray-400">OS #{order.id.split('-')[1]}</span>
-                                    <span className="font-bold text-gray-900">{formatCurrency(order.totalValue)}</span>
                                  </div>
                               </div>
-                           </div>
-                        ))}
-                     </div>
-                  )}
+                           ))}
+                        </div>
+                     )}
+                  </div>
                </div>
             </div>
-         </div>
-      )}
-    </div>
-  );
+         )}
+      </div>
+   );
 };
 
 const OSView: React.FC<{ companyId: string }> = ({ companyId }) => {
-  const { company } = useAuth();
-  const [orders, setOrders] = useState<ServiceOrder[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [mechanics, setMechanics] = useState<TeamMember[]>([]);
-  
-  const [view, setView] = useState<'list' | 'form'>('list');
-  const [searchTerm, setSearchTerm] = useState('');
-  
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Partial<ServiceOrder>>({});
-  
-  const [selProd, setSelProd] = useState('');
-  const [selQty, setSelQty] = useState(1);
+   const { company } = useAuth();
+   const [orders, setOrders] = useState<ServiceOrder[]>([]);
+   const [customers, setCustomers] = useState<Customer[]>([]);
+   const [products, setProducts] = useState<Product[]>([]);
+   const [mechanics, setMechanics] = useState<TeamMember[]>([]);
 
-  const [showChecklist, setShowChecklist] = useState(false);
-  const [checklist, setChecklist] = useState<Checklist | null>(null);
+   const [view, setView] = useState<'list' | 'form'>('list');
+   const [searchTerm, setSearchTerm] = useState('');
 
-  const loadData = async () => {
-     const [o, c, p, m] = await Promise.all([
-        dbService.getServiceOrders(companyId),
-        dbService.getCustomers(companyId),
-        dbService.getProducts(companyId),
-        dbService.getTeamMembers(companyId)
-     ]);
-     setOrders(o.sort((a,b) => b.createdAt - a.createdAt));
-     setCustomers(c);
-     setProducts(p);
-     setMechanics(m);
-  };
+   const [editingId, setEditingId] = useState<string | null>(null);
+   const [formData, setFormData] = useState<Partial<ServiceOrder>>({});
 
-  useEffect(() => { loadData(); }, [companyId]);
+   const [selProd, setSelProd] = useState('');
+   const [selQty, setSelQty] = useState(1);
 
-  const handleCreate = () => {
-     setEditingId(null);
-     setFormData({
-        status: OSStatus.PENDING,
-        items: [],
-        laborValue: 0,
-        totalValue: 0,
-        description: ''
-     });
-     setChecklist(null);
-     setView('form');
-  };
+   const [showChecklist, setShowChecklist] = useState(false);
+   const [checklist, setChecklist] = useState<Checklist | null>(null);
 
-  const handleEdit = async (os: ServiceOrder) => {
-     setEditingId(os.id);
-     setFormData({ ...os });
-     const chk = await dbService.getChecklist(os.id);
-     setChecklist(chk);
-     setView('form');
-  };
+   const loadData = async () => {
+      const [o, c, p, m] = await Promise.all([
+         dbService.getServiceOrders(companyId),
+         dbService.getCustomers(companyId),
+         dbService.getProducts(companyId),
+         dbService.getTeamMembers(companyId)
+      ]);
+      setOrders(o.sort((a, b) => b.createdAt - a.createdAt));
+      setCustomers(c);
+      setProducts(p);
+      setMechanics(m);
+   };
 
-  const handleSave = async () => {
-     if (!formData.customerId || !formData.description) {
-        alert("Cliente e Descrição são obrigatórios.");
-        return;
-     }
+   useEffect(() => { loadData(); }, [companyId]);
 
-     const cust = customers.find(c => c.id === formData.customerId);
-     const mech = mechanics.find(m => m.id === formData.mechanicId);
+   const handleCreate = () => {
+      setEditingId(null);
+      setFormData({
+         status: OSStatus.PENDING,
+         items: [],
+         laborValue: 0,
+         totalValue: 0,
+         description: ''
+      });
+      setChecklist(null);
+      setView('form');
+   };
 
-     const data = {
-        companyId,
-        customerId: formData.customerId,
-        customerName: cust?.name || 'Cliente',
-        vehicle: formData.vehicle || (cust ? `${cust.vehicleModel} (${cust.vehiclePlate})` : ''),
-        description: formData.description,
-        status: formData.status || OSStatus.PENDING,
-        mechanicId: formData.mechanicId,
-        mechanicName: mech?.name,
-        laborValue: Number(formData.laborValue) || 0,
-        items: formData.items || [],
-        totalValue: (Number(formData.laborValue) || 0) + (formData.items?.reduce((acc, i) => acc + i.total, 0) || 0)
-     };
+   const handleEdit = async (os: ServiceOrder) => {
+      setEditingId(os.id);
+      setFormData({ ...os });
+      const chk = await dbService.getChecklist(os.id);
+      setChecklist(chk);
+      setView('form');
+   };
 
-     if (editingId) {
-        await dbService.updateServiceOrder(editingId, data);
-     } else {
-        const newOS = await dbService.createServiceOrder(data);
-        setEditingId(newOS.id);
-        setFormData({ ...data, id: newOS.id });
-     }
-     
-     if(view === 'form') {
+   const handleSave = async () => {
+      if (!formData.customerId || !formData.description) {
+         alert("Cliente e Descrição são obrigatórios.");
+         return;
+      }
+
+      const cust = customers.find(c => c.id === formData.customerId);
+      const mech = mechanics.find(m => m.id === formData.mechanicId);
+
+      const data = {
+         companyId,
+         customerId: formData.customerId,
+         customerName: cust?.name || 'Cliente',
+         vehicle: formData.vehicle || (cust ? `${cust.vehicleModel} (${cust.vehiclePlate})` : ''),
+         description: formData.description,
+         status: formData.status || OSStatus.PENDING,
+         mechanicId: formData.mechanicId,
+         mechanicName: mech?.name,
+         laborValue: Number(formData.laborValue) || 0,
+         items: formData.items || [],
+         totalValue: (Number(formData.laborValue) || 0) + (formData.items?.reduce((acc, i) => acc + i.total, 0) || 0)
+      };
+
+      if (editingId) {
+         await dbService.updateServiceOrder(editingId, data);
+      } else {
+         const newOS = await dbService.createServiceOrder(data);
+         setEditingId(newOS.id);
+         setFormData({ ...data, id: newOS.id });
+      }
+
+      if (view === 'form') {
          setView('list');
          loadData();
-     }
-  };
+      }
+   };
 
-  const handleAddItem = () => {
-     const p = products.find(x => x.id === selProd);
-     if (p) {
-        const newItem: OSItem = {
-           productId: p.id,
-           name: p.name,
-           quantity: selQty,
-           unitPrice: p.sellPrice,
-           total: p.sellPrice * selQty
-        };
-        const newItems = [...(formData.items || []), newItem];
-        setFormData({ ...formData, items: newItems });
-        setSelProd('');
-        setSelQty(1);
-     }
-  };
+   const handleAddItem = () => {
+      const p = products.find(x => x.id === selProd);
+      if (p) {
+         const newItem: OSItem = {
+            productId: p.id,
+            name: p.name,
+            quantity: selQty,
+            unitPrice: p.sellPrice,
+            total: p.sellPrice * selQty
+         };
+         const newItems = [...(formData.items || []), newItem];
+         setFormData({ ...formData, items: newItems });
+         setSelProd('');
+         setSelQty(1);
+      }
+   };
 
-  const handleRemoveItem = (idx: number) => {
-     const newItems = [...(formData.items || [])];
-     newItems.splice(idx, 1);
-     setFormData({ ...formData, items: newItems });
-  };
+   const handleRemoveItem = (idx: number) => {
+      const newItems = [...(formData.items || [])];
+      newItems.splice(idx, 1);
+      setFormData({ ...formData, items: newItems });
+   };
 
-  const handlePrint = (os: ServiceOrder) => {
-     const cust = customers.find(c => c.id === os.customerId);
-     if(view === 'form' && checklist) {
+   const handlePrint = (os: ServiceOrder) => {
+      const cust = customers.find(c => c.id === os.customerId);
+      if (view === 'form' && checklist) {
          printOrder(os, cust, company, checklist);
-     } else {
+      } else {
          dbService.getChecklist(os.id).then(chk => {
             printOrder(os, cust, company, chk);
          });
-     }
-  };
+      }
+   };
 
-  const handleOpenChecklist = () => {
-     if(!checklist) {
-        setChecklist({
-           id: '', osId: editingId || '', companyId, fuelLevel: 2, 
-           items: [
-              { name: 'Luzes', status: ChecklistStatus.OK },
-              { name: 'Pneus', status: ChecklistStatus.OK },
-              { name: 'Lataria', status: ChecklistStatus.OK },
-              { name: 'Vidros', status: ChecklistStatus.OK },
-           ],
-           notes: '', updatedAt: Date.now()
-        });
-     }
-     setShowChecklist(true);
-  };
-  
-  const handleSaveChecklist = async () => {
-     if(checklist && editingId) {
-        const saved = await dbService.saveChecklist({ ...checklist, osId: editingId });
-        setChecklist(saved);
-        setShowChecklist(false);
-     } else {
-        alert("Salve a OS antes de editar o checklist.");
-     }
-  };
+   const handleOpenChecklist = () => {
+      if (!checklist) {
+         setChecklist({
+            id: '', osId: editingId || '', companyId, fuelLevel: 2,
+            items: [
+               { name: 'Luzes', status: ChecklistStatus.OK },
+               { name: 'Pneus', status: ChecklistStatus.OK },
+               { name: 'Lataria', status: ChecklistStatus.OK },
+               { name: 'Vidros', status: ChecklistStatus.OK },
+            ],
+            notes: '', updatedAt: Date.now()
+         });
+      }
+      setShowChecklist(true);
+   };
 
-  const filteredOrders = orders.filter(o => 
-     o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-     o.id.includes(searchTerm) ||
-     o.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+   const handleSaveChecklist = async () => {
+      if (checklist && editingId) {
+         const saved = await dbService.saveChecklist({ ...checklist, osId: editingId });
+         setChecklist(saved);
+         setShowChecklist(false);
+      } else {
+         alert("Salve a OS antes de editar o checklist.");
+      }
+   };
 
-  if (view === 'list') {
-     return (
-        <div className="space-y-6">
-           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-              <h3 className="text-lg font-bold text-gray-800">Ordens de Serviço</h3>
-              <div className="flex gap-2 w-full md:w-auto">
-                 <div className="relative flex-1 md:w-64">
-                    <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
-                    <input value={searchTerm} onChange={e=>setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Buscar OS..." />
-                 </div>
-                 <button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shrink-0">
-                    <Plus size={18} /> Nova OS
-                 </button>
-              </div>
-           </div>
+   const filteredOrders = orders.filter(o =>
+      o.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      o.id.includes(searchTerm) ||
+      o.vehicle.toLowerCase().includes(searchTerm.toLowerCase())
+   );
 
-           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                 <thead className="bg-gray-50">
-                    <tr>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nº OS</th>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente / Veículo</th>
-                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                       <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
-                       <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
-                    </tr>
-                 </thead>
-                 <tbody className="divide-y divide-gray-200">
-                    {filteredOrders.map(os => (
-                       <tr key={os.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 font-mono text-sm text-gray-500">#{os.id.split('-')[1]}</td>
-                          <td className="px-6 py-4 text-sm text-gray-500">{new Date(os.createdAt).toLocaleDateString()}</td>
-                          <td className="px-6 py-4">
-                             <div className="font-medium text-gray-900">{os.customerName}</div>
-                             <div className="text-xs text-gray-500">{os.vehicle}</div>
-                          </td>
-                          <td className="px-6 py-4">
-                             <span className={`px-2 py-1 rounded-full text-xs font-bold ${
-                                os.status === OSStatus.COMPLETED ? 'bg-green-100 text-green-700' : 
-                                os.status === OSStatus.PENDING ? 'bg-yellow-100 text-yellow-700' :
-                                os.status === OSStatus.CANCELED ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                             }`}>
-                                {os.status}
-                             </span>
-                          </td>
-                          <td className="px-6 py-4 text-right font-bold text-gray-900">{formatCurrency(os.totalValue)}</td>
-                          <td className="px-6 py-4 flex justify-center gap-2">
-                             <button onClick={() => handleEdit(os)} className="text-blue-500 hover:text-blue-700 p-2"><Pencil size={18}/></button>
-                             <button onClick={() => handlePrint(os)} className="text-gray-500 hover:text-gray-700 p-2"><Printer size={18}/></button>
-                          </td>
-                       </tr>
-                    ))}
-                 </tbody>
-              </table>
-           </div>
-        </div>
-     );
-  }
+   if (view === 'list') {
+      return (
+         <div className="space-y-6">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+               <h3 className="text-lg font-bold text-gray-800">Ordens de Serviço</h3>
+               <div className="flex gap-2 w-full md:w-auto">
+                  <div className="relative flex-1 md:w-64">
+                     <Search className="absolute left-3 top-2.5 text-gray-400" size={18} />
+                     <input value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Buscar OS..." />
+                  </div>
+                  <button onClick={handleCreate} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 shrink-0">
+                     <Plus size={18} /> Nova OS
+                  </button>
+               </div>
+            </div>
 
-  const totalParts = formData.items?.reduce((acc, i) => acc + i.total, 0) || 0;
-  const totalOS = (Number(formData.laborValue) || 0) + totalParts;
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+               <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                     <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nº OS</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Data</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cliente / Veículo</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total</th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">Ações</th>
+                     </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                     {filteredOrders.map(os => (
+                        <tr key={os.id} className="hover:bg-gray-50">
+                           <td className="px-6 py-4 font-mono text-sm text-gray-500">#{os.id.split('-')[1]}</td>
+                           <td className="px-6 py-4 text-sm text-gray-500">{new Date(os.createdAt).toLocaleDateString()}</td>
+                           <td className="px-6 py-4">
+                              <div className="font-medium text-gray-900">{os.customerName}</div>
+                              <div className="text-xs text-gray-500">{os.vehicle}</div>
+                           </td>
+                           <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded-full text-xs font-bold ${os.status === OSStatus.COMPLETED ? 'bg-green-100 text-green-700' :
+                                 os.status === OSStatus.PENDING ? 'bg-yellow-100 text-yellow-700' :
+                                    os.status === OSStatus.CANCELED ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                                 }`}>
+                                 {os.status}
+                              </span>
+                           </td>
+                           <td className="px-6 py-4 text-right font-bold text-gray-900">{formatCurrency(os.totalValue)}</td>
+                           <td className="px-6 py-4 flex justify-center gap-2">
+                              <button onClick={() => handleEdit(os)} className="text-blue-500 hover:text-blue-700 p-2"><Pencil size={18} /></button>
+                              <button onClick={() => handlePrint(os)} className="text-gray-500 hover:text-gray-700 p-2"><Printer size={18} /></button>
+                           </td>
+                        </tr>
+                     ))}
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      );
+   }
 
-  return (
-     <div className="space-y-6">
-        <div className="flex items-center gap-4 mb-4">
-           <button onClick={() => setView('list')} className="text-gray-500 hover:text-gray-700 flex items-center gap-1">
-              <ArrowLeft size={18} /> Voltar
-           </button>
-           <h3 className="text-xl font-bold text-gray-800">
-              {editingId ? `Editando OS #${editingId.split('-')[1]}` : 'Nova Ordem de Serviço'}
-           </h3>
-        </div>
+   const totalParts = formData.items?.reduce((acc, i) => acc + i.total, 0) || 0;
+   const totalOS = (Number(formData.laborValue) || 0) + totalParts;
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-           <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                 <h4 className="font-bold text-gray-700 mb-4 border-b pb-2">Dados Principais</h4>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                       <label className="block text-xs font-medium text-gray-500 mb-1">Cliente</label>
-                       <select 
-                          className="w-full border p-2 rounded" 
-                          value={formData.customerId || ''} 
-                          onChange={e => {
-                             const c = customers.find(x => x.id === e.target.value);
-                             setFormData({ 
-                                ...formData, 
-                                customerId: e.target.value,
-                                vehicle: c ? `${c.vehicleModel} (${c.vehiclePlate})` : ''
-                             });
-                          }}
-                       >
-                          <option value="">Selecione...</option>
-                          {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                       </select>
-                    </div>
-                    <div>
+   return (
+      <div className="space-y-6">
+         <div className="flex items-center gap-4 mb-4">
+            <button onClick={() => setView('list')} className="text-gray-500 hover:text-gray-700 flex items-center gap-1">
+               <ArrowLeft size={18} /> Voltar
+            </button>
+            <h3 className="text-xl font-bold text-gray-800">
+               {editingId ? `Editando OS #${editingId.split('-')[1]}` : 'Nova Ordem de Serviço'}
+            </h3>
+         </div>
+
+         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                  <h4 className="font-bold text-gray-700 mb-4 border-b pb-2">Dados Principais</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                     <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Cliente</label>
+                        <select
+                           className="w-full border p-2 rounded"
+                           value={formData.customerId || ''}
+                           onChange={e => {
+                              const c = customers.find(x => x.id === e.target.value);
+                              setFormData({
+                                 ...formData,
+                                 customerId: e.target.value,
+                                 vehicle: c ? `${c.vehicleModel} (${c.vehiclePlate})` : ''
+                              });
+                           }}
+                        >
+                           <option value="">Selecione...</option>
+                           {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+                     </div>
+                     <div>
                         <label className="block text-xs font-medium text-gray-500 mb-1">Veículo</label>
-                        <input className="w-full border p-2 rounded bg-gray-50" value={formData.vehicle || ''} onChange={e => setFormData({...formData, vehicle: e.target.value})} />
-                    </div>
-                    <div className="md:col-span-2">
+                        <input className="w-full border p-2 rounded bg-gray-50" value={formData.vehicle || ''} onChange={e => setFormData({ ...formData, vehicle: e.target.value })} />
+                     </div>
+                     <div className="md:col-span-2">
                         <label className="block text-xs font-medium text-gray-500 mb-1">Descrição do Problema / Serviço</label>
-                        <textarea className="w-full border p-2 rounded" rows={3} value={formData.description || ''} onChange={e => setFormData({...formData, description: e.target.value})}></textarea>
-                    </div>
-                    <div>
-                       <label className="block text-xs font-medium text-gray-500 mb-1">Mecânico Responsável</label>
-                       <select className="w-full border p-2 rounded" value={formData.mechanicId || ''} onChange={e => setFormData({...formData, mechanicId: e.target.value})}>
-                          <option value="">Selecione...</option>
-                          {mechanics.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                       </select>
-                    </div>
-                    <div>
-                       <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
-                       <select className="w-full border p-2 rounded font-bold" value={formData.status || OSStatus.PENDING} onChange={e => setFormData({...formData, status: e.target.value as OSStatus})}>
-                          <option value={OSStatus.PENDING}>Pendente / Orçamento</option>
-                          <option value={OSStatus.IN_PROGRESS}>Em Execução</option>
-                          <option value={OSStatus.WAITING_PARTS}>Aguardando Peças</option>
-                          <option value={OSStatus.COMPLETED}>Finalizada</option>
-                          <option value={OSStatus.CANCELED}>Cancelada</option>
-                       </select>
-                    </div>
-                 </div>
-              </div>
+                        <textarea className="w-full border p-2 rounded" rows={3} value={formData.description || ''} onChange={e => setFormData({ ...formData, description: e.target.value })}></textarea>
+                     </div>
+                     <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Mecânico Responsável</label>
+                        <select className="w-full border p-2 rounded" value={formData.mechanicId || ''} onChange={e => setFormData({ ...formData, mechanicId: e.target.value })}>
+                           <option value="">Selecione...</option>
+                           {mechanics.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                        </select>
+                     </div>
+                     <div>
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Status</label>
+                        <select className="w-full border p-2 rounded font-bold" value={formData.status || OSStatus.PENDING} onChange={e => setFormData({ ...formData, status: e.target.value as OSStatus })}>
+                           <option value={OSStatus.PENDING}>Pendente / Orçamento</option>
+                           <option value={OSStatus.IN_PROGRESS}>Em Execução</option>
+                           <option value={OSStatus.WAITING_PARTS}>Aguardando Peças</option>
+                           <option value={OSStatus.COMPLETED}>Finalizada</option>
+                           <option value={OSStatus.CANCELED}>Cancelada</option>
+                        </select>
+                     </div>
+                  </div>
+               </div>
 
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                 <h4 className="font-bold text-gray-700 mb-4 border-b pb-2 flex justify-between items-center">
-                    Peças e Serviços
-                 </h4>
-                 
-                 <div className="flex gap-2 mb-4 bg-gray-50 p-3 rounded-lg items-end">
-                    <div className="flex-1">
-                       <label className="block text-xs font-medium text-gray-500 mb-1">Adicionar Peça</label>
-                       <select className="w-full border p-2 rounded" value={selProd} onChange={e => setSelProd(e.target.value)}>
-                          <option value="">Selecione...</option>
-                          {products.map(p => <option key={p.id} value={p.id}>{p.name} ({formatCurrency(p.sellPrice)})</option>)}
-                       </select>
-                    </div>
-                    <div className="w-20">
-                       <label className="block text-xs font-medium text-gray-500 mb-1">Qtd</label>
-                       <input type="number" className="w-full border p-2 rounded" value={selQty} onChange={e => setSelQty(Number(e.target.value))} />
-                    </div>
-                    <button onClick={handleAddItem} className="bg-green-600 text-white p-2.5 rounded hover:bg-green-700">
-                       <Plus size={18} />
-                    </button>
-                 </div>
+               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                  <h4 className="font-bold text-gray-700 mb-4 border-b pb-2 flex justify-between items-center">
+                     Peças e Serviços
+                  </h4>
 
-                 <table className="min-w-full text-sm">
-                    <thead className="bg-gray-50 text-gray-500">
-                       <tr>
-                          <th className="px-4 py-2 text-left">Item</th>
-                          <th className="px-4 py-2 text-center">Qtd</th>
-                          <th className="px-4 py-2 text-right">Unit.</th>
-                          <th className="px-4 py-2 text-right">Total</th>
-                          <th className="px-4 py-2"></th>
-                       </tr>
-                    </thead>
-                    <tbody>
-                       {formData.items?.map((item, idx) => (
-                          <tr key={idx} className="border-b last:border-0">
-                             <td className="px-4 py-3">{item.name}</td>
-                             <td className="px-4 py-3 text-center">{item.quantity}</td>
-                             <td className="px-4 py-3 text-right">{formatCurrency(item.unitPrice)}</td>
-                             <td className="px-4 py-3 text-right font-medium">{formatCurrency(item.total)}</td>
-                             <td className="px-4 py-3 text-center">
-                                <button onClick={() => handleRemoveItem(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={16}/></button>
-                             </td>
-                          </tr>
-                       ))}
-                       {!formData.items?.length && <tr><td colSpan={5} className="text-center py-4 text-gray-400">Nenhuma peça adicionada.</td></tr>}
-                    </tbody>
-                 </table>
-              </div>
-           </div>
+                  <div className="flex gap-2 mb-4 bg-gray-50 p-3 rounded-lg items-end">
+                     <div className="flex-1">
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Adicionar Peça</label>
+                        <select className="w-full border p-2 rounded" value={selProd} onChange={e => setSelProd(e.target.value)}>
+                           <option value="">Selecione...</option>
+                           {products.map(p => <option key={p.id} value={p.id}>{p.name} ({formatCurrency(p.sellPrice)})</option>)}
+                        </select>
+                     </div>
+                     <div className="w-20">
+                        <label className="block text-xs font-medium text-gray-500 mb-1">Qtd</label>
+                        <input type="number" className="w-full border p-2 rounded" value={selQty} onChange={e => setSelQty(Number(e.target.value))} />
+                     </div>
+                     <button onClick={handleAddItem} className="bg-green-600 text-white p-2.5 rounded hover:bg-green-700">
+                        <Plus size={18} />
+                     </button>
+                  </div>
 
-           <div className="space-y-6">
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                 <h4 className="font-bold text-gray-700 mb-4 border-b pb-2">Valores</h4>
-                 
-                 <div className="space-y-3 mb-6">
-                    <div className="flex justify-between items-center text-sm">
-                       <span className="text-gray-500">Total Peças</span>
-                       <span className="font-medium">{formatCurrency(totalParts)}</span>
-                    </div>
-                    <div className="flex justify-between items-center text-sm">
-                       <span className="text-gray-500">Mão de Obra</span>
-                       <div className="flex items-center gap-1 w-32">
-                          <span className="text-gray-400 text-xs">R$</span>
-                          <input 
-                             type="number" 
-                             className="w-full text-right border-b border-gray-300 focus:border-blue-500 outline-none p-1 font-medium" 
-                             value={formData.laborValue} 
-                             onChange={e => setFormData({...formData, laborValue: Number(e.target.value)})}
-                          />
-                       </div>
-                    </div>
-                    <div className="flex justify-between items-center text-lg font-bold border-t pt-3 mt-3">
-                       <span>TOTAL</span>
-                       <span className="text-blue-600">{formatCurrency(totalOS)}</span>
-                    </div>
-                 </div>
+                  <table className="min-w-full text-sm">
+                     <thead className="bg-gray-50 text-gray-500">
+                        <tr>
+                           <th className="px-4 py-2 text-left">Item</th>
+                           <th className="px-4 py-2 text-center">Qtd</th>
+                           <th className="px-4 py-2 text-right">Unit.</th>
+                           <th className="px-4 py-2 text-right">Total</th>
+                           <th className="px-4 py-2"></th>
+                        </tr>
+                     </thead>
+                     <tbody>
+                        {formData.items?.map((item, idx) => (
+                           <tr key={idx} className="border-b last:border-0">
+                              <td className="px-4 py-3">{item.name}</td>
+                              <td className="px-4 py-3 text-center">{item.quantity}</td>
+                              <td className="px-4 py-3 text-right">{formatCurrency(item.unitPrice)}</td>
+                              <td className="px-4 py-3 text-right font-medium">{formatCurrency(item.total)}</td>
+                              <td className="px-4 py-3 text-center">
+                                 <button onClick={() => handleRemoveItem(idx)} className="text-red-400 hover:text-red-600"><Trash2 size={16} /></button>
+                              </td>
+                           </tr>
+                        ))}
+                        {!formData.items?.length && <tr><td colSpan={5} className="text-center py-4 text-gray-400">Nenhuma peça adicionada.</td></tr>}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
 
-                 <button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-500/30 mb-3 flex justify-center gap-2">
-                    <Save size={20} /> Salvar OS
-                 </button>
-                 
-                 {editingId && (
-                    <button onClick={() => handlePrint(formData as ServiceOrder)} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-lg flex justify-center gap-2">
-                       <Printer size={20} /> Imprimir
-                    </button>
-                 )}
-              </div>
+            <div className="space-y-6">
+               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                  <h4 className="font-bold text-gray-700 mb-4 border-b pb-2">Valores</h4>
 
-              <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-                 <h4 className="font-bold text-gray-700 mb-4 border-b pb-2">Vistoria & Checklist</h4>
-                 <div className="text-center">
-                    {checklist ? (
-                       <div className="mb-4 text-left bg-green-50 p-3 rounded border border-green-100">
-                          <p className="text-sm text-green-800 font-bold flex items-center gap-2"><CheckCircle size={16}/> Checklist Realizado</p>
-                          <p className="text-xs text-green-600 mt-1">Nível de Combustível: {['Vazio','1/4','1/2','3/4','Cheio'][checklist.fuelLevel]}</p>
-                       </div>
-                    ) : (
-                       <p className="text-sm text-gray-400 mb-4">Nenhuma vistoria registrada.</p>
-                    )}
-                    <button 
-                       onClick={handleOpenChecklist}
-                       disabled={!editingId}
-                       className="w-full border-2 border-dashed border-gray-300 hover:border-blue-500 text-gray-500 hover:text-blue-500 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                       {checklist ? 'Editar Vistoria' : 'Realizar Vistoria de Entrada'}
-                    </button>
-                    {!editingId && <p className="text-xs text-gray-400 mt-2">Salve a OS para liberar.</p>}
-                 </div>
-              </div>
-           </div>
-        </div>
+                  <div className="space-y-3 mb-6">
+                     <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Total Peças</span>
+                        <span className="font-medium">{formatCurrency(totalParts)}</span>
+                     </div>
+                     <div className="flex justify-between items-center text-sm">
+                        <span className="text-gray-500">Mão de Obra</span>
+                        <div className="flex items-center gap-1 w-32">
+                           <span className="text-gray-400 text-xs">R$</span>
+                           <input
+                              type="number"
+                              className="w-full text-right border-b border-gray-300 focus:border-blue-500 outline-none p-1 font-medium"
+                              value={formData.laborValue}
+                              onChange={e => setFormData({ ...formData, laborValue: Number(e.target.value) })}
+                           />
+                        </div>
+                     </div>
+                     <div className="flex justify-between items-center text-lg font-bold border-t pt-3 mt-3">
+                        <span>TOTAL</span>
+                        <span className="text-blue-600">{formatCurrency(totalOS)}</span>
+                     </div>
+                  </div>
 
-        {showChecklist && checklist && (
-           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                 <h3 className="text-lg font-bold mb-4">Vistoria do Veículo</h3>
-                 
-                 <div className="space-y-6">
-                    <div>
-                       <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Combustível</label>
-                       <div className="flex justify-between bg-gray-100 rounded-lg p-1">
-                          {[0, 1, 2, 3, 4].map(level => (
-                             <button 
-                                key={level}
-                                onClick={() => setChecklist({...checklist, fuelLevel: level})}
-                                className={`flex-1 py-1 rounded text-xs font-bold transition-all ${checklist.fuelLevel === level ? 'bg-white shadow text-blue-600' : 'text-gray-400'}`}
-                             >
-                                {['E', '1/4', '1/2', '3/4', 'F'][level]}
-                             </button>
-                          ))}
-                       </div>
-                       <div className="flex justify-between px-1 mt-1">
-                          <span className="text-xs text-red-400"><Fuel size={14}/></span>
-                          <span className="text-xs text-green-400"><Fuel size={14}/></span>
-                       </div>
-                    </div>
+                  <button onClick={handleSave} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg shadow-lg shadow-blue-500/30 mb-3 flex justify-center gap-2">
+                     <Save size={20} /> Salvar OS
+                  </button>
 
-                    <div>
-                       <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Itens Inspecionados</label>
-                       <div className="space-y-2">
-                          {checklist.items.map((item, idx) => (
-                             <div key={idx} className="flex items-center justify-between border-b border-gray-100 pb-2">
-                                <span className="font-medium text-sm">{item.name}</span>
-                                <div className="flex gap-1">
-                                    <button 
+                  {editingId && (
+                     <button onClick={() => handlePrint(formData as ServiceOrder)} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 rounded-lg flex justify-center gap-2">
+                        <Printer size={20} /> Imprimir
+                     </button>
+                  )}
+               </div>
+
+               <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                  <h4 className="font-bold text-gray-700 mb-4 border-b pb-2">Vistoria & Checklist</h4>
+                  <div className="text-center">
+                     {checklist ? (
+                        <div className="mb-4 text-left bg-green-50 p-3 rounded border border-green-100">
+                           <p className="text-sm text-green-800 font-bold flex items-center gap-2"><CheckCircle size={16} /> Checklist Realizado</p>
+                           <p className="text-xs text-green-600 mt-1">Nível de Combustível: {['Vazio', '1/4', '1/2', '3/4', 'Cheio'][checklist.fuelLevel]}</p>
+                        </div>
+                     ) : (
+                        <p className="text-sm text-gray-400 mb-4">Nenhuma vistoria registrada.</p>
+                     )}
+                     <button
+                        onClick={handleOpenChecklist}
+                        disabled={!editingId}
+                        className="w-full border-2 border-dashed border-gray-300 hover:border-blue-500 text-gray-500 hover:text-blue-500 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                     >
+                        {checklist ? 'Editar Vistoria' : 'Realizar Vistoria de Entrada'}
+                     </button>
+                     {!editingId && <p className="text-xs text-gray-400 mt-2">Salve a OS para liberar.</p>}
+                  </div>
+               </div>
+            </div>
+         </div>
+
+         {showChecklist && checklist && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+               <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                  <h3 className="text-lg font-bold mb-4">Vistoria do Veículo</h3>
+
+                  <div className="space-y-6">
+                     <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Combustível</label>
+                        <div className="flex justify-between bg-gray-100 rounded-lg p-1">
+                           {[0, 1, 2, 3, 4].map(level => (
+                              <button
+                                 key={level}
+                                 onClick={() => setChecklist({ ...checklist, fuelLevel: level })}
+                                 className={`flex-1 py-1 rounded text-xs font-bold transition-all ${checklist.fuelLevel === level ? 'bg-white shadow text-blue-600' : 'text-gray-400'}`}
+                              >
+                                 {['E', '1/4', '1/2', '3/4', 'F'][level]}
+                              </button>
+                           ))}
+                        </div>
+                        <div className="flex justify-between px-1 mt-1">
+                           <span className="text-xs text-red-400"><Fuel size={14} /></span>
+                           <span className="text-xs text-green-400"><Fuel size={14} /></span>
+                        </div>
+                     </div>
+
+                     <div>
+                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Itens Inspecionados</label>
+                        <div className="space-y-2">
+                           {checklist.items.map((item, idx) => (
+                              <div key={idx} className="flex items-center justify-between border-b border-gray-100 pb-2">
+                                 <span className="font-medium text-sm">{item.name}</span>
+                                 <div className="flex gap-1">
+                                    <button
                                        onClick={() => {
                                           const newItems = [...checklist.items];
                                           newItems[idx].status = ChecklistStatus.OK;
-                                          setChecklist({...checklist, items: newItems});
+                                          setChecklist({ ...checklist, items: newItems });
                                        }}
                                        className={`p-1 px-2 rounded text-xs font-bold ${item.status === ChecklistStatus.OK ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'}`}
                                     >OK</button>
-                                    <button 
+                                    <button
                                        onClick={() => {
                                           const newItems = [...checklist.items];
                                           newItems[idx].status = ChecklistStatus.DAMAGED;
-                                          setChecklist({...checklist, items: newItems});
+                                          setChecklist({ ...checklist, items: newItems });
                                        }}
                                        className={`p-1 px-2 rounded text-xs font-bold ${item.status === ChecklistStatus.DAMAGED ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-400'}`}
                                     >Avariado</button>
-                                    <button 
+                                    <button
                                        onClick={() => {
                                           const newItems = [...checklist.items];
                                           newItems[idx].status = ChecklistStatus.MISSING;
-                                          setChecklist({...checklist, items: newItems});
+                                          setChecklist({ ...checklist, items: newItems });
                                        }}
                                        className={`p-1 px-2 rounded text-xs font-bold ${item.status === ChecklistStatus.MISSING ? 'bg-orange-100 text-orange-700' : 'bg-gray-100 text-gray-400'}`}
                                     >Ausente</button>
-                                </div>
-                             </div>
-                          ))}
-                       </div>
-                    </div>
-                    
-                    <div>
+                                 </div>
+                              </div>
+                           ))}
+                        </div>
+                     </div>
+
+                     <div>
                         <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Observações Adicionais</label>
-                        <textarea 
-                           className="w-full border p-2 rounded text-sm" 
-                           rows={3} 
+                        <textarea
+                           className="w-full border p-2 rounded text-sm"
+                           rows={3}
                            placeholder="Riscos, amassados pré-existentes..."
                            value={checklist.notes}
-                           onChange={e => setChecklist({...checklist, notes: e.target.value})}
+                           onChange={e => setChecklist({ ...checklist, notes: e.target.value })}
                         ></textarea>
-                    </div>
+                     </div>
 
-                    <div className="flex gap-2 justify-end pt-4 border-t">
+                     <div className="flex gap-2 justify-end pt-4 border-t">
                         <button onClick={() => setShowChecklist(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded">Cancelar</button>
                         <button onClick={handleSaveChecklist} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Salvar Checklist</button>
-                    </div>
-                 </div>
-              </div>
-           </div>
-        )}
-     </div>
-  );
+                     </div>
+                  </div>
+               </div>
+            </div>
+         )}
+      </div>
+   );
 };
 
 export const ClientDashboard: React.FC<{ page: string, onNavigate: (page: string) => void }> = ({ page, onNavigate }) => {
-  const { company, user } = useAuth();
-  
-  const isExpired = company ? company.expiresAt < Date.now() : false;
+   const { company, user } = useAuth();
 
-  const openWhatsAppSupport = () => {
-      const SUPPORT_PHONE = "5511999999999"; 
+   const isExpired = company ? company.expiresAt < Date.now() : false;
+
+   const openWhatsAppSupport = () => {
+      const SUPPORT_PHONE = "5511999999999";
       const msg = encodeURIComponent(`Olá, sou da oficina *${company?.name || 'Cliente'}* e minha licença expirou. Gostaria de renovar.`);
       window.open(`https://wa.me/${SUPPORT_PHONE}?text=${msg}`, '_blank');
-  };
+   };
 
-  if (isExpired && page !== 'dashboard' && page !== 'settings') {
-    return (
-       <div className="flex flex-col items-center justify-center h-96 text-center px-4">
-          <div className="bg-red-100 p-6 rounded-full mb-4 animate-bounce">
-             <Ban size={48} className="text-red-600" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Acesso Temporariamente Bloqueado</h2>
-          <p className="text-gray-600 max-w-md mb-6">
-             Sua licença de uso expirou. Para continuar emitindo OS e gerenciando sua oficina, renove seu plano agora mesmo.
-          </p>
-          <button 
-             onClick={openWhatsAppSupport}
-             className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-green-600/30 flex items-center gap-2 transform hover:scale-105 transition-all"
-          >
-             <MessageCircle size={20} />
-             Renovar Licença via WhatsApp
-          </button>
-       </div>
-    );
-  }
+   if (isExpired && page !== 'dashboard' && page !== 'settings') {
+      return (
+         <div className="flex flex-col items-center justify-center h-96 text-center px-4">
+            <div className="bg-red-100 p-6 rounded-full mb-4 animate-bounce">
+               <Ban size={48} className="text-red-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2">Acesso Temporariamente Bloqueado</h2>
+            <p className="text-gray-600 max-w-md mb-6">
+               Sua licença de uso expirou. Para continuar emitindo OS e gerenciando sua oficina, renove seu plano agora mesmo.
+            </p>
+            <button
+               onClick={openWhatsAppSupport}
+               className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-green-600/30 flex items-center gap-2 transform hover:scale-105 transition-all"
+            >
+               <MessageCircle size={20} />
+               Renovar Licença via WhatsApp
+            </button>
+         </div>
+      );
+   }
 
-  if (page === 'dashboard') return <HomeView companyId={company!.id} />;
-  if (page === 'agenda') return <AgendaView companyId={company!.id} onNavigate={onNavigate} />;
-  if (page === 'customers') return <CustomersView companyId={company!.id} />;
-  if (page === 'os') return <OSView companyId={company!.id} />;
-  if (page === 'team') return <TeamView companyId={company!.id} />; 
-  if (page === 'inventory') return <InventoryView companyId={company!.id} />;
-  if (page === 'financial') return <FinancialView companyId={company!.id} />; 
-  if (page === 'reports') return <ReportsView companyId={company!.id} />;
-  if (page === 'settings') return <SettingsView companyId={company!.id} />;
+   if (page === 'dashboard') return <HomeView companyId={company!.id} />;
+   if (page === 'agenda') return <AgendaView companyId={company!.id} onNavigate={onNavigate} />;
+   if (page === 'customers') return <CustomersView companyId={company!.id} />;
+   if (page === 'os') return <OSView companyId={company!.id} />;
+   if (page === 'team') return <TeamView companyId={company!.id} />;
+   if (page === 'inventory') return <InventoryView companyId={company!.id} />;
+   if (page === 'financial') return <FinancialView companyId={company!.id} />;
+   if (page === 'reports') return <ReportsView companyId={company!.id} />;
+   if (page === 'settings') return <SettingsView companyId={company!.id} />;
 
-  return null;
+   return null;
 };
