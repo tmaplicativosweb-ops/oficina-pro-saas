@@ -2551,6 +2551,123 @@ const OSView: React.FC<{ companyId: string }> = ({ companyId }) => {
    );
 };
 
+const SupportWidget: React.FC = () => {
+   const { company } = useAuth();
+   const [isOpen, setIsOpen] = useState(false);
+   const [messages, setMessages] = useState<ChatMessage[]>([]);
+   const [inputText, setInputText] = useState('');
+   const [unreadCount, setUnreadCount] = useState(0);
+   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+   useEffect(() => {
+      if (!company) return;
+
+      const unsubscribe = dbService.subscribeToChatMessages(company.id, (msgs) => {
+         setMessages(msgs);
+         // Simple unread logic: if closed, count messages from 'MASTER' that are unread (or just count last few)
+         // For simplicity in this mock, we just highlight if last msg is from MASTER and we are closed.
+         const lastMsg = msgs[msgs.length - 1];
+         if (!isOpen && lastMsg && lastMsg.senderRole === 'MASTER') {
+            setUnreadCount(prev => prev + 1);
+         }
+      });
+      return () => unsubscribe();
+   }, [company, isOpen]);
+
+   useEffect(() => {
+      if (isOpen) {
+         setUnreadCount(0);
+         messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }
+   }, [messages, isOpen]);
+
+   const handleSend = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!inputText.trim() || !company) return;
+
+      const newMessage: Omit<ChatMessage, 'id'> = {
+         companyId: company.id,
+         senderRole: 'CLIENT',
+         senderName: company.name,
+         text: inputText,
+         createdAt: Date.now(),
+         read: false
+      };
+
+      await dbService.sendChatMessage(newMessage);
+      setInputText('');
+   };
+
+   if (!company) return null;
+
+   return (
+      <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
+         {/* Chat Window */}
+         {isOpen && (
+            <div className="bg-white pointer-events-auto rounded-xl shadow-2xl border border-gray-200 w-80 h-96 mb-4 flex flex-col overflow-hidden animate-in slide-in-from-bottom-10 fade-in duration-200">
+               <div className="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
+                  <div className="flex items-center gap-2">
+                     <div className="bg-white/20 p-2 rounded-full"><MessageSquare size={16} /></div>
+                     <div>
+                        <h4 className="font-bold text-sm">Suporte Técnico</h4>
+                        <p className="text-[10px] opacity-80">Ajudamos você em instantes</p>
+                     </div>
+                  </div>
+                  <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded transition-colors"><XCircle size={20} /></button>
+               </div>
+
+               <div className="flex-1 bg-slate-50 overflow-y-auto p-4 space-y-3">
+                  {messages.length === 0 && (
+                     <p className="text-center text-gray-400 text-xs mt-10">Envie uma mensagem para iniciar o atendimento.</p>
+                  )}
+                  {messages.map(msg => (
+                     <div key={msg.id} className={`flex flex-col ${msg.senderRole === 'CLIENT' ? 'items-end' : 'items-start'}`}>
+                        <div className={`max-w-[85%] p-2 px-3 rounded-lg text-xs shadow-sm ${msg.senderRole === 'CLIENT'
+                           ? 'bg-blue-100 text-blue-900 rounded-br-none border border-blue-200'
+                           : 'bg-white text-gray-800 rounded-bl-none border border-gray-200'
+                           }`}>
+                           <p className="font-bold text-[9px] opacity-60 mb-0.5">{msg.senderName}</p>
+                           {msg.text}
+                        </div>
+                        <span className="text-[9px] text-gray-400 mt-1 px-1">
+                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                     </div>
+                  ))}
+                  <div ref={messagesEndRef} />
+               </div>
+
+               <form onSubmit={handleSend} className="p-3 bg-white border-t border-gray-100 flex gap-2">
+                  <input
+                     className="flex-1 text-sm bg-gray-50 border-gray-200 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-blue-500 transition-all"
+                     placeholder="Escreva sua dúvida..."
+                     value={inputText}
+                     onChange={e => setInputText(e.target.value)}
+                  />
+                  <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-lg transition-colors shadow-sm">
+                     <Send size={18} />
+                  </button>
+               </form>
+            </div>
+         )}
+
+         {/* Toggle Button */}
+         <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="pointer-events-auto bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg shadow-blue-600/30 transition-all transform hover:scale-110 flex items-center justify-center relative group"
+         >
+            {isOpen ? <XCircle size={24} /> : <MessageSquare size={24} />}
+
+            {!isOpen && unreadCount > 0 && (
+               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full animate-bounce">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+               </span>
+            )}
+         </button>
+      </div>
+   );
+};
+
 export const ClientDashboard: React.FC<{ page: string, onNavigate: (page: string) => void }> = ({ page, onNavigate }) => {
    const { company, user } = useAuth();
 
@@ -2562,36 +2679,44 @@ export const ClientDashboard: React.FC<{ page: string, onNavigate: (page: string
       window.open(`https://wa.me/${SUPPORT_PHONE}?text=${msg}`, '_blank');
    };
 
-   if (isExpired && page !== 'dashboard' && page !== 'settings') {
-      return (
-         <div className="flex flex-col items-center justify-center h-96 text-center px-4">
-            <div className="bg-red-100 p-6 rounded-full mb-4 animate-bounce">
-               <Ban size={48} className="text-red-600" />
+   const renderContent = () => {
+      if (isExpired && page !== 'dashboard' && page !== 'settings') {
+         return (
+            <div className="flex flex-col items-center justify-center h-96 text-center px-4">
+               <div className="bg-red-100 p-6 rounded-full mb-4 animate-bounce">
+                  <Ban size={48} className="text-red-600" />
+               </div>
+               <h2 className="text-2xl font-bold text-gray-800 mb-2">Acesso Temporariamente Bloqueado</h2>
+               <p className="text-gray-600 max-w-md mb-6">
+                  Sua licença de uso expirou. Para continuar emitindo OS e gerenciando sua oficina, renove seu plano agora mesmo.
+               </p>
+               <button
+                  onClick={openWhatsAppSupport}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-green-600/30 flex items-center gap-2 transform hover:scale-105 transition-all"
+               >
+                  <MessageCircle size={20} />
+                  Renovar Licença via WhatsApp
+               </button>
             </div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Acesso Temporariamente Bloqueado</h2>
-            <p className="text-gray-600 max-w-md mb-6">
-               Sua licença de uso expirou. Para continuar emitindo OS e gerenciando sua oficina, renove seu plano agora mesmo.
-            </p>
-            <button
-               onClick={openWhatsAppSupport}
-               className="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg shadow-green-600/30 flex items-center gap-2 transform hover:scale-105 transition-all"
-            >
-               <MessageCircle size={20} />
-               Renovar Licença via WhatsApp
-            </button>
-         </div>
-      );
-   }
+         );
+      }
 
-   if (page === 'dashboard') return <HomeView companyId={company!.id} />;
-   if (page === 'agenda') return <AgendaView companyId={company!.id} onNavigate={onNavigate} />;
-   if (page === 'customers') return <CustomersView companyId={company!.id} />;
-   if (page === 'os') return <OSView companyId={company!.id} />;
-   if (page === 'team') return <TeamView companyId={company!.id} />;
-   if (page === 'inventory') return <InventoryView companyId={company!.id} />;
-   if (page === 'financial') return <FinancialView companyId={company!.id} />;
-   if (page === 'reports') return <ReportsView companyId={company!.id} />;
-   if (page === 'settings') return <SettingsView companyId={company!.id} />;
+      if (page === 'dashboard') return <HomeView companyId={company!.id} />;
+      if (page === 'agenda') return <AgendaView companyId={company!.id} onNavigate={onNavigate} />;
+      if (page === 'customers') return <CustomersView companyId={company!.id} />;
+      if (page === 'os') return <OSView companyId={company!.id} />;
+      if (page === 'team') return <TeamView companyId={company!.id} />;
+      if (page === 'inventory') return <InventoryView companyId={company!.id} />;
+      if (page === 'financial') return <FinancialView companyId={company!.id} />;
+      if (page === 'reports') return <ReportsView companyId={company!.id} />;
+      if (page === 'settings') return <SettingsView companyId={company!.id} />;
+      return null;
+   };
 
-   return null;
+   return (
+      <>
+         {renderContent()}
+         <SupportWidget />
+      </>
+   );
 };

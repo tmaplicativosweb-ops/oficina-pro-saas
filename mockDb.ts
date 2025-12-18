@@ -151,16 +151,21 @@ export const dbService = {
     await updateDoc(ref, { status });
   },
 
-  extendLicense: async (companyId: string, plan: PlanType, daysToAdd: number) => {
+  extendLicense: async (companyId: string, plan: PlanType, monthsToAdd: number) => {
     const ref = doc(db, "companies", companyId);
     const snap = await getDoc(ref);
     if (!snap.exists()) return;
 
     const currentData = snap.data() as Company;
-    const currentExpiry = currentData.expiresAt > Date.now() ? currentData.expiresAt : Date.now();
+    // Se já expirou, renova a partir de agora. Se não, soma ao vencimento atual.
+    const baseTime = currentData.expiresAt > Date.now() ? currentData.expiresAt : Date.now();
+    const newDate = new Date(baseTime);
+
+    // Adiciona meses (o Date do JS trata virada de ano e dias automaticamente)
+    newDate.setMonth(newDate.getMonth() + monthsToAdd);
 
     await updateDoc(ref, {
-      expiresAt: currentExpiry + (daysToAdd * 24 * 60 * 60 * 1000),
+      expiresAt: newDate.getTime(),
       plan,
       status: CompanyStatus.ACTIVE
     });
@@ -481,5 +486,21 @@ export const dbService = {
       checklists: checklistsSnap.docs.map(d => ({ id: d.id, ...d.data() })),
       exportedAt: Date.now()
     };
+  },
+
+  subscribeToChatMessages: (companyId: string, cb: (msgs: ChatMessage[]) => void) => {
+    const q = query(
+      collection(db, "chat_messages"),
+      where("companyId", "==", companyId),
+      orderBy("createdAt", "asc")
+    );
+    return onSnapshot(q, (snapshot) => {
+      const msgs = snapshot.docs.map(d => mapDoc<ChatMessage>(d));
+      cb(msgs);
+    });
+  },
+
+  sendChatMessage: async (msg: Omit<ChatMessage, 'id'>) => {
+    await addDoc(collection(db, "chat_messages"), msg);
   }
 };
