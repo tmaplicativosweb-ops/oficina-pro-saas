@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { dbService, authService } from './mockDb';
 import { Company, CompanyStatus, PlanType, ChatMessage } from './types';
-import { Shield, Ban, CheckCircle, Calendar, LogIn, DollarSign, TrendingUp, AlertTriangle, Users, MessageSquare, Send, Loader2, Zap } from 'lucide-react';
+import { Shield, Ban, CheckCircle, LogIn, DollarSign, TrendingUp, AlertTriangle, Users, MessageSquare, Send, Loader2, Clock } from 'lucide-react';
 import { useAuth } from './AuthContext';
 
 const formatCurrency = (val: number) => {
@@ -38,8 +38,12 @@ const SupportChat: React.FC<{ companies: Company[] }> = ({ companies }) => {
 
     const loadMsgs = async () => {
         if (!selectedId) return;
-        const data = await dbService.getChatMessages(selectedId);
-        setMessages(data);
+        try {
+            const data = await dbService.getChatMessages(selectedId);
+            setMessages(data);
+        } catch (err) {
+            console.error("Erro ao carregar chat", err);
+        }
     };
 
     useEffect(() => {
@@ -150,12 +154,13 @@ export const MasterDashboard: React.FC = () => {
     }
   };
 
-  const handleExtend = async (id: string, plan: PlanType, days: number) => {
-    if(window.confirm(`Deseja realmente renovar esta oficina por mais ${days} dias?`)) {
+  const handleRenew30Days = async (id: string) => {
+    if(window.confirm(`Deseja liberar mais 30 dias de acesso para esta oficina?`)) {
        setProcessingId(id);
        try {
-           await dbService.extendLicense(id, plan, days);
-           alert("Licença renovada com sucesso e status atualizado para Ativo!");
+           // Usamos o plano mensal como padrão para a renovação de 30 dias
+           await dbService.extendLicense(id, PlanType.MONTHLY, 30);
+           alert("Licença renovada por +30 dias com sucesso!");
            await fetchCompanies();
        } catch (err) {
            alert("Ocorreu um erro ao processar a renovação.");
@@ -210,7 +215,6 @@ export const MasterDashboard: React.FC = () => {
                     <thead className="bg-gray-50">
                     <tr>
                         <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Empresa</th>
-                        <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Plano</th>
                         <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Expiração</th>
                         <th className="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
                         <th className="px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase">Ações</th>
@@ -228,7 +232,6 @@ export const MasterDashboard: React.FC = () => {
                                 <div className="font-bold text-gray-900">{c.name}</div>
                                 <div className="text-xs text-gray-400">{c.document} | {c.email}</div>
                             </td>
-                            <td className="px-6 py-4 text-sm font-semibold text-blue-600">{c.plan}</td>
                             <td className="px-6 py-4 text-sm">
                                 <span className={isExpired ? 'text-red-600 font-bold' : 'text-gray-700'}>
                                     {isExpired ? 'VENCIDA' : `${daysLeft} dias`}
@@ -244,21 +247,24 @@ export const MasterDashboard: React.FC = () => {
                                     <Loader2 className="animate-spin text-blue-600" size={24} />
                                 ) : (
                                     <>
-                                        <button onClick={() => handleImpersonate(c.id, c.name)} title="Entrar no Painel do Cliente" className="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors border border-transparent hover:border-indigo-100"><LogIn size={18}/></button>
+                                        <button onClick={() => handleImpersonate(c.id, c.name)} title="Entrar no Painel do Cliente" className="p-2 text-indigo-500 hover:bg-indigo-50 rounded-lg transition-colors border border-transparent hover:border-indigo-100">
+                                            <LogIn size={20}/>
+                                        </button>
                                         
-                                        <button onClick={() => handleExtend(c.id, PlanType.DEMO, 7)} title="Liberação Rápida (+7 dias Demo)" className="p-2 text-orange-500 hover:bg-orange-50 rounded-lg transition-colors border border-transparent hover:border-orange-100"><Zap size={18}/></button>
-                                        
-                                        <div className="relative group">
-                                            <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg border border-transparent hover:border-blue-100"><Calendar size={18}/></button>
-                                            <div className="absolute right-0 bottom-full mb-2 w-48 bg-white border border-gray-200 rounded-lg shadow-xl hidden group-hover:block z-50 p-2 animate-in fade-in slide-in-from-bottom-2">
-                                                <p className="text-[10px] text-gray-400 font-bold p-1 uppercase">Opções de Renovação</p>
-                                                <button onClick={() => handleExtend(c.id, PlanType.MONTHLY, 30)} className="w-full text-left text-xs p-2 hover:bg-blue-50 rounded">Mensal (+30 dias)</button>
-                                                <button onClick={() => handleExtend(c.id, PlanType.ANNUAL, 365)} className="w-full text-left text-xs p-2 hover:bg-blue-50 rounded">Anual (+365 dias)</button>
-                                            </div>
-                                        </div>
+                                        <button 
+                                            onClick={() => handleRenew30Days(c.id)} 
+                                            title="Renovar +30 Dias" 
+                                            className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-bold rounded-lg transition-all flex items-center gap-2 shadow-sm shadow-green-200"
+                                        >
+                                            <Clock size={16}/> Liberar +30 Dias
+                                        </button>
 
-                                        <button onClick={() => handleStatusChange(c.id, c.status === CompanyStatus.ACTIVE ? CompanyStatus.BLOCKED : CompanyStatus.ACTIVE)} title={c.status === CompanyStatus.ACTIVE ? "Bloquear Oficina" : "Desbloquear Oficina"} className={`p-2 rounded-lg transition-colors border border-transparent ${c.status === CompanyStatus.ACTIVE ? 'text-red-400 hover:bg-red-50 hover:border-red-100' : 'text-green-400 hover:bg-green-50 hover:border-green-100'}`}>
-                                            {c.status === CompanyStatus.ACTIVE ? <Ban size={18}/> : <CheckCircle size={18}/>}
+                                        <button 
+                                            onClick={() => handleStatusChange(c.id, c.status === CompanyStatus.ACTIVE ? CompanyStatus.BLOCKED : CompanyStatus.ACTIVE)} 
+                                            title={c.status === CompanyStatus.ACTIVE ? "Bloquear Oficina" : "Desbloquear Oficina"} 
+                                            className={`p-2 rounded-lg transition-colors border border-transparent ${c.status === CompanyStatus.ACTIVE ? 'text-red-400 hover:bg-red-50 hover:border-red-100' : 'text-green-400 hover:bg-green-50 hover:border-green-100'}`}
+                                        >
+                                            {c.status === CompanyStatus.ACTIVE ? <Ban size={20}/> : <CheckCircle size={20}/>}
                                         </button>
                                     </>
                                 )}
