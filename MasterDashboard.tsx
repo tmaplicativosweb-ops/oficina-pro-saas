@@ -158,7 +158,7 @@ export const MasterDashboard: React.FC = () => {
     if(window.confirm(`Deseja liberar mais 30 dias de acesso para esta oficina?`)) {
        setProcessingId(id);
        try {
-           // Usamos o plano mensal como padrão para a renovação de 30 dias
+           // Renovação fixa de 30 dias conforme pedido
            await dbService.extendLicense(id, PlanType.MONTHLY, 30);
            alert("Licença renovada por +30 dias com sucesso!");
            await fetchCompanies();

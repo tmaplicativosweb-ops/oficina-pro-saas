@@ -60,7 +60,9 @@ export const authService = {
     const userCred = await signInWithEmailAndPassword(auth, email, pass);
     const fbUser = userCred.user;
     const userDoc = await getDoc(doc(db, "users", fbUser.uid));
+    
     if (!userDoc.exists()) throw new Error("Usuário não encontrado.");
+    
     const userData = userDoc.data() as User;
     const cleanUser: User = { ...userData, id: fbUser.uid };
 
@@ -69,7 +71,7 @@ export const authService = {
       const companyDoc = await getDoc(doc(db, "companies", cleanUser.companyId));
       if (companyDoc.exists()) {
         company = mapDoc<Company>(companyDoc);
-        if (company.status === CompanyStatus.BLOCKED) throw new Error("Acesso bloqueado.");
+        if (company.status === CompanyStatus.BLOCKED) throw new Error("Acesso bloqueado pelo administrador.");
       }
     }
     return { user: cleanUser, company };
@@ -119,26 +121,18 @@ export const dbService = {
   extendLicense: async (companyId: string, plan: PlanType, daysToAdd: number) => {
     const ref = doc(db, "companies", companyId);
     const snap = await getDoc(ref);
-    if (!snap.exists()) throw new Error("Empresa não encontrada.");
-    
+    if (!snap.exists()) return;
     const currentData = snap.data() as Company;
-    const now = Date.now();
     
-    // Se a empresa já expirou ou a data é inválida, começamos a contar de HOJE.
-    // Se ela ainda tem tempo, somamos ao tempo restante.
-    const currentExpiry = (currentData.expiresAt && currentData.expiresAt > now) 
-      ? currentData.expiresAt 
-      : now;
-      
-    const newExpiry = currentExpiry + (daysToAdd * 24 * 60 * 60 * 1000);
+    const now = Date.now();
+    const baseDate = (currentData.expiresAt && currentData.expiresAt > now) ? currentData.expiresAt : now;
+    const newExpiry = baseDate + (daysToAdd * 24 * 60 * 60 * 1000);
     
     await updateDoc(ref, { 
         expiresAt: newExpiry, 
         plan, 
         status: CompanyStatus.ACTIVE 
     });
-    
-    return newExpiry;
   },
 
   updateCompany: async (companyId: string, data: Partial<Company>): Promise<Company> => {
@@ -148,19 +142,22 @@ export const dbService = {
      return mapDoc<Company>(snap);
   },
 
-  // CHAT SYSTEM
+  // Suporte Chat
   sendChatMessage: async (msg: Omit<ChatMessage, 'id'>) => {
     const ref = await addDoc(collection(db, "support_messages"), msg);
     return { id: ref.id, ...msg };
   },
 
   getChatMessages: async (companyId: string): Promise<ChatMessage[]> => {
-    const q = query(collection(db, "support_messages"), where("companyId", "==", companyId), orderBy("createdAt", "asc"));
+    // Para evitar erro de índice composto, removemos o orderBy da query e fazemos no cliente
+    const q = query(collection(db, "support_messages"), where("companyId", "==", companyId));
     const snap = await getDocs(q);
-    return snap.docs.map(d => mapDoc<ChatMessage>(d));
+    const messages = snap.docs.map(d => mapDoc<ChatMessage>(d));
+    // Ordenação no cliente (Crescente)
+    return messages.sort((a, b) => a.createdAt - b.createdAt);
   },
 
-  // OTHERS
+  // Negócio
   getCustomers: async (companyId: string) => {
     const q = query(collection(db, "customers"), where("companyId", "==", companyId));
     const snapshot = await getDocs(q);
@@ -203,9 +200,12 @@ export const dbService = {
     await updateDoc(doc(db, "service_orders", id), { ...updates, updatedAt: Date.now() });
   },
   getTransactions: async (companyId: string) => {
-    const q = query(collection(db, "transactions"), where("companyId", "==", companyId), orderBy("date", "desc"));
+    // Para evitar erro de índice composto, removemos o orderBy da query e fazemos no cliente
+    const q = query(collection(db, "transactions"), where("companyId", "==", companyId));
     const snapshot = await getDocs(q);
-    return snapshot.docs.map(d => mapDoc<Transaction>(d));
+    const transactions = snapshot.docs.map(d => mapDoc<Transaction>(d));
+    // Ordenação no cliente (Decrescente por data)
+    return transactions.sort((a, b) => b.date - a.date);
   },
   createTransaction: async (data: Omit<Transaction, 'id'>) => {
     const ref = await addDoc(collection(db, "transactions"), data);
@@ -238,10 +238,10 @@ export const dbService = {
   updateAppointmentStatus: async (id: string, status: any) => {
     await updateDoc(doc(db, "appointments", id), { status });
   },
-  updateAppointment: async (id: string, data: Partial<Appointment>): Promise<void> => {
+  updateAppointment: async (id: string, data: Partial<Appointment>) => {
     await updateDoc(doc(db, "appointments", id), data);
   },
-  deleteAppointment: async (id: string): Promise<void> => {
+  deleteAppointment: async (id: string) => {
     await deleteDoc(doc(db, "appointments", id));
   },
   getChecklist: async (osId: string) => {
@@ -270,52 +270,29 @@ export const dbService = {
     return backup;
   },
   clearCompanyData: async (companyId: string, keys: string[]) => {
-    const keyMap: Record<string, string> = {
-      customers: "customers",
-      products: "products",
-      os: "service_orders",
-      financial: "transactions",
-      team: "team",
-      agenda: "appointments"
-    };
+    const keyMap: Record<string, string> = { customers: "customers", products: "products", os: "service_orders", financial: "transactions", team: "team", agenda: "appointments" };
     for (const key of keys) {
       const col = keyMap[key];
       if (!col) continue;
       const q = query(collection(db, col), where("companyId", "==", companyId));
       const snap = await getDocs(q);
       await Promise.all(snap.docs.map(d => deleteDoc(doc(db, col, d.id))));
-      if (key === 'os') {
-        const qc = query(collection(db, "checklists"), where("companyId", "==", companyId));
-        const sc = await getDocs(qc);
-        await Promise.all(sc.docs.map(d => deleteDoc(doc(db, "checklists", d.id))));
-      }
     }
   },
   getStats: async (companyId: string) => {
     const osSnap = await getDocs(query(collection(db, "service_orders"), where("companyId", "==", companyId)));
     const custSnap = await getDocs(query(collection(db, "customers"), where("companyId", "==", companyId)));
     const teamSnap = await getDocs(query(collection(db, "team"), where("companyId", "==", companyId)));
-
     const allOS = osSnap.docs.map(d => mapDoc<ServiceOrder>(d));
     const allCust = custSnap.docs.map(d => mapDoc<Customer>(d));
     const team = teamSnap.docs.map(d => mapDoc<TeamMember>(d));
-
     const completed = allOS.filter(o => o.status === OSStatus.COMPLETED);
     const revenue = completed.reduce((acc, curr) => acc + (Number(curr.totalValue) || 0), 0);
     const avgTicket = completed.length > 0 ? revenue / completed.length : 0;
-
     const history = [ {label: 'Mensal', value: revenue} ];
     let totalLabor = completed.reduce((acc, o) => acc + (Number(o.laborValue) || 0), 0);
     let totalParts = revenue - totalLabor;
-
-    const ranking = team.map(t => ({
-        name: t.name,
-        value: allOS.filter(o => o.status === OSStatus.COMPLETED && o.mechanicId === t.id).reduce((acc, o) => acc + o.totalValue, 0)
-    })).sort((a,b) => b.value - a.value);
-
-    return {
-      summary: { totalCustomers: allCust.length, pendingOS: allOS.filter(o => o.status !== OSStatus.COMPLETED).length, completedOS: completed.length, revenue, avgTicket },
-      history, split: { labor: totalLabor, parts: totalParts }, ranking
-    };
+    const ranking = team.map(t => ({ name: t.name, value: allOS.filter(o => o.status === OSStatus.COMPLETED && o.mechanicId === t.id).reduce((acc, o) => acc + o.totalValue, 0) })).sort((a,b) => b.value - a.value);
+    return { summary: { totalCustomers: allCust.length, pendingOS: allOS.filter(o => o.status !== OSStatus.COMPLETED).length, completedOS: completed.length, revenue, avgTicket }, history, split: { labor: totalLabor, parts: totalParts }, ranking };
   }
 };
